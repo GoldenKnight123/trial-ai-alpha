@@ -12,6 +12,10 @@ import javafx.util.Duration;
 public abstract class Controller {
 
   private Timeline typewriterTimeline; // Timeline for typewriter effect
+  public boolean isTyping = false;
+  private String currentFullText = ""; // Store the full text being displayed
+  private TextArea currentTextArea = null; // Store the current TextArea being used
+  private boolean currentClearFirst = true; // Store whether we're clearing first
 
   /**
    * Creates a typewriter effect for displaying text in a TextArea.
@@ -28,16 +32,24 @@ public abstract class Controller {
       typewriterTimeline.stop();
     }
 
+    // Store current typewriter state
+    currentTextArea = textArea;
+    currentFullText = textToDisplay;
+    currentClearFirst = clearFirst;
+
     // Clear or preserve existing text
     if (clearFirst) {
       textArea.clear();
     }
+
+    isTyping = true;
 
     String existingText = textArea.getText();
 
     // Create the typewriter animation
     typewriterTimeline = new Timeline();
 
+    // Will add threading in the future
     for (int i = 0; i <= textToDisplay.length(); i++) {
       final int charIndex = i;
       KeyFrame keyFrame =
@@ -48,6 +60,12 @@ public abstract class Controller {
                   textArea.setText(textToDisplay.substring(0, charIndex));
                 } else {
                   textArea.setText(existingText + textToDisplay.substring(0, charIndex));
+                }
+
+                // Check if this is the last character being displayed
+                if (charIndex == textToDisplay.length()) {
+                  isTyping = false;
+                  onTypewriterEffectFinish();
                 }
               });
       typewriterTimeline.getKeyFrames().add(keyFrame);
@@ -106,5 +124,30 @@ public abstract class Controller {
     if (typewriterTimeline != null) {
       typewriterTimeline.stop();
     }
+  }
+
+  /** Instantly finishes the current typewriter effect by displaying the full text. */
+  protected void finishTypewriterEffectInstantly() {
+    if (isTyping && currentTextArea != null && currentFullText != null) {
+      // Stop the current animation
+      if (typewriterTimeline != null) {
+        typewriterTimeline.stop();
+      }
+
+      // Set the full text immediately
+      currentTextArea.setText(currentFullText);
+
+      isTyping = false;
+      onTypewriterEffectFinish();
+    }
+  }
+
+  /** Called when the typewriter effect finishes. */
+  protected void onTypewriterEffectFinish() {
+    // Override this method in subclasses to handle the end of the typewriter effect
+  }
+
+  protected boolean isTyping() {
+    return isTyping;
   }
 }

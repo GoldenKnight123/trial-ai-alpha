@@ -49,4 +49,10 @@ public class GameOver implements GameState {
   public void handleGuessClick() throws IOException {
     TextToSpeech.speak("You have already guessed!");
   }
+
+  @Override
+  public void handleGeneralClick() throws IOException {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'handleGeneralClick'");
+  }
 }

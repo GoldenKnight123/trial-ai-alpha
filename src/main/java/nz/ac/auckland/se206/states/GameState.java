@@ -24,4 +24,11 @@ public interface GameState {
    * @throws IOException if there is an I/O error
    */
   void handleGuessClick() throws IOException;
+
+  /**
+   * Handles the event when the mouse button is clicked anywhere in the game area.
+   *
+   * @throws IOException if there is an I/O error
+   */
+  void handleGeneralClick() throws IOException;
 }

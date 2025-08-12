@@ -9,7 +9,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<Pane fx:id="room" focusTraversable="true" onKeyPressed="#onKeyPressed" onKeyReleased="#onKeyReleased" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #A9A9A9;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nz.ac.auckland.se206.controllers.RoomController">
+<Pane fx:id="room" focusTraversable="true" onKeyPressed="#onKeyPressed" onKeyReleased="#onKeyReleased" onMouseClicked="#handleGeneralClick" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #A9A9A9;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nz.ac.auckland.se206.controllers.RoomController">
    <children>
       <ImageView fitHeight="243.0" fitWidth="120.0" layoutX="606.0" layoutY="289.0" preserveRatio="true">
          <image>
@@ -55,10 +55,11 @@
             <Font size="21.0" />
          </font>
       </Label>
-      <TextArea fx:id="txtaDialogue" editable="false" layoutX="16.0" layoutY="14.0" prefHeight="200.0" prefWidth="1248.0" text="Text Here">
+      <TextArea fx:id="txtaDialogue" editable="false" layoutX="16.0" layoutY="14.0" prefHeight="200.0" prefWidth="1248.0" text="Text Here" wrapText="true">
          <font>
             <Font size="24.0" />
          </font>
       </TextArea>
+      <Label fx:id="lblContinue" layoutX="1165.0" layoutY="197.0" prefHeight="17.0" prefWidth="99.0" text="Click to continue." />
    </children>
 </Pane>

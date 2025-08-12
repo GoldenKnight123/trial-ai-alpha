@@ -73,4 +73,10 @@ public class GameStarted implements GameState {
     TextToSpeech.speak(guessMessage);
     context.setState(context.getGuessingState());
   }
+
+  @Override
+  public void handleGeneralClick() throws IOException {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'handleGeneralClick'");
+  }
 }

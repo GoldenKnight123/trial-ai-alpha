@@ -3,6 +3,7 @@ package nz.ac.auckland.se206.states;
 import java.io.IOException;
 import javafx.scene.input.MouseEvent;
 import nz.ac.auckland.se206.GameStateContext;
+import nz.ac.auckland.se206.controllers.RoomController;
 
 public class OpeningStatement implements GameState {
 
@@ -27,5 +28,15 @@ public class OpeningStatement implements GameState {
   public void handleGuessClick() throws IOException {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'handleGuessClick'");
+  }
+
+  @Override
+  public void handleGeneralClick() throws IOException {
+    RoomController roomController = context.getRoomController();
+    if (roomController.isTyping()) {
+      roomController.finishTypingInstantly();
+    } else {
+      roomController.displayNextLine();
+    }
   }
 }
