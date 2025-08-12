@@ -30,6 +30,7 @@ public class TextToSpeech {
 
     Task<Void> backgroundTask =
         new Task<>() {
+          @SuppressWarnings("deprecation")
           @Override
           protected Void call() {
             try {
