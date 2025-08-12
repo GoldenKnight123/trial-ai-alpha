@@ -63,6 +63,7 @@ public class App extends Application {
     String cacheKey = fxml;
 
     if (!sceneCache.containsKey(cacheKey)) {
+      System.out.println("loading");
       FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/" + fxml + ".fxml"));
       Parent root = loader.load();
       Object controller = loader.getController();
@@ -114,6 +115,14 @@ public class App extends Application {
     primaryStage.show();
   }
 
+  public static void openRoom(MouseEvent event) throws IOException {
+    SceneControllerPair pair = loadAndCacheScene("room");
+
+    scene = pair.getScene();
+    primaryStage.setScene(scene);
+    primaryStage.show();
+  }
+
   /**
    * This method is invoked when the application starts. It loads and shows the "room" scene using
    * the caching system.
@@ -124,7 +133,7 @@ public class App extends Application {
   @Override
   public void start(final Stage stage) throws IOException {
     primaryStage = stage; // Store reference to primary stage
-    SceneControllerPair pair = loadAndCacheScene("room");
+    SceneControllerPair pair = loadAndCacheScene("startMenu");
     scene = pair.getScene();
     stage.setScene(scene);
     stage.show();
