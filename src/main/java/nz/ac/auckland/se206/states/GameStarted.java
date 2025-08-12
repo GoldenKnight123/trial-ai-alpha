@@ -4,6 +4,7 @@ import java.io.IOException;
 import javafx.scene.input.MouseEvent;
 import nz.ac.auckland.se206.App;
 import nz.ac.auckland.se206.GameStateContext;
+import nz.ac.auckland.se206.controllers.RoomController;
 import nz.ac.auckland.se206.speech.TextToSpeech;
 
 /**
@@ -34,12 +35,22 @@ public class GameStarted implements GameState {
   @Override
   public void handleRectangleClick(MouseEvent event, String rectangleId) throws IOException {
     // Transition to chat view or provide an introduction based on the clicked rectangle
+    RoomController roomController = context.getRoomController();
+
     switch (rectangleId) {
       case "rectCashier":
-        TextToSpeech.speak("Welcome to my cafe!");
+        String cashierMessage = "Welcome to my cafe!";
+        if (roomController != null) {
+          roomController.displayTextWithTypewriterEffect(cashierMessage);
+        }
+        TextToSpeech.speak(cashierMessage);
         return;
       case "rectWaitress":
-        TextToSpeech.speak("Hi, let me know when you are ready to order!");
+        String waitressMessage = "Hi, let me know when you are ready to order!";
+        if (roomController != null) {
+          roomController.displayTextWithTypewriterEffect(waitressMessage);
+        }
+        TextToSpeech.speak(waitressMessage);
         return;
     }
     App.openChat(event, context.getProfession(rectangleId));
@@ -53,7 +64,13 @@ public class GameStarted implements GameState {
    */
   @Override
   public void handleGuessClick() throws IOException {
-    TextToSpeech.speak("Make a guess, click on the " + context.getProfessionToGuess());
+    String guessMessage = "Make a guess, click on the " + context.getProfessionToGuess();
+    RoomController roomController = context.getRoomController();
+
+    if (roomController != null) {
+      roomController.displayTextWithTypewriterEffect(guessMessage);
+    }
+    TextToSpeech.speak(guessMessage);
     context.setState(context.getGuessingState());
   }
 }

@@ -3,6 +3,7 @@ package nz.ac.auckland.se206.states;
 import java.io.IOException;
 import javafx.scene.input.MouseEvent;
 import nz.ac.auckland.se206.GameStateContext;
+import nz.ac.auckland.se206.controllers.RoomController;
 import nz.ac.auckland.se206.speech.TextToSpeech;
 
 /**
@@ -32,17 +33,30 @@ public class Guessing implements GameState {
    */
   @Override
   public void handleRectangleClick(MouseEvent event, String rectangleId) throws IOException {
+    RoomController roomController = context.getRoomController();
+
     if (rectangleId.equals("rectCashier") || rectangleId.equals("rectWaitress")) {
-      TextToSpeech.speak("You should click on the customers");
+      String message = "You should click on the customers";
+      if (roomController != null) {
+        roomController.displayTextWithTypewriterEffect(message);
+      }
+      TextToSpeech.speak(message);
       return;
     }
 
     String clickedProfession = context.getProfession(rectangleId);
+    String resultMessage;
+
     if (rectangleId.equals(context.getRectIdToGuess())) {
-      TextToSpeech.speak("Correct! You won! This is the " + clickedProfession);
+      resultMessage = "Correct! You won! This is the " + clickedProfession;
     } else {
-      TextToSpeech.speak("You lost! This is the " + clickedProfession);
+      resultMessage = "You lost! This is the " + clickedProfession;
     }
+
+    if (roomController != null) {
+      roomController.displayTextWithTypewriterEffect(resultMessage);
+    }
+    TextToSpeech.speak(resultMessage);
     context.setState(context.getGameOverState());
   }
 
@@ -54,6 +68,12 @@ public class Guessing implements GameState {
    */
   @Override
   public void handleGuessClick() throws IOException {
-    TextToSpeech.speak("You have already guessed!");
+    String message = "You have already guessed!";
+    RoomController roomController = context.getRoomController();
+
+    if (roomController != null) {
+      roomController.displayTextWithTypewriterEffect(message);
+    }
+    TextToSpeech.speak(message);
   }
 }

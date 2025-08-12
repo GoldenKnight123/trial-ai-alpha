@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
@@ -15,13 +16,12 @@ import nz.ac.auckland.se206.speech.TextToSpeech;
  * Controller class for the room view. Handles user interactions within the room where the user can
  * chat with customers and guess their profession.
  */
-public class RoomController {
+public class RoomController extends Controller {
 
-  @FXML private Rectangle rectCashier;
-  @FXML private Rectangle rectPerson1;
-  @FXML private Rectangle rectPerson2;
-  @FXML private Rectangle rectPerson3;
-  @FXML private Rectangle rectWaitress;
+  @FXML private Rectangle rectWitnessAI;
+  @FXML private Rectangle rectDefendant;
+  @FXML private Rectangle rectWitnessHuman;
+  @FXML private TextArea txtaDialogue;
   @FXML private Label lblProfession;
   @FXML private Button btnGuess;
 
@@ -29,15 +29,36 @@ public class RoomController {
   private static GameStateContext context = new GameStateContext();
 
   /**
+   * Creates a typewriter effect for displaying text in the dialogue area.
+   *
+   * @param textToDisplay the text to display with typewriter effect
+   * @param delayPerCharacter delay between each character in milliseconds
+   */
+  public void displayTextWithTypewriterEffect(String textToDisplay, double delayPerCharacter) {
+    super.displayTextWithTypewriterEffect(txtaDialogue, textToDisplay, delayPerCharacter);
+  }
+
+  /**
+   * Displays text with typewriter effect using default speed (50ms per character).
+   *
+   * @param textToDisplay the text to display with typewriter effect
+   */
+  public void displayTextWithTypewriterEffect(String textToDisplay) {
+    super.displayTextWithTypewriterEffect(txtaDialogue, textToDisplay, 50);
+  }
+
+  /**
    * Initializes the room view. If it's the first time initialization, it will provide instructions
    * via text-to-speech.
    */
   @FXML
   public void initialize() {
+    context.setRoomController(this); // Set reference to this controller
     if (isFirstTimeInit) {
-      TextToSpeech.speak(
-          "Chat with the three customers, and guess who is the "
-              + context.getProfessionToGuess());
+      String welcomeMessage =
+          "Chat with the three customers, and guess who is the " + context.getProfessionToGuess();
+      displayTextWithTypewriterEffect(welcomeMessage);
+      TextToSpeech.speak(welcomeMessage);
       isFirstTimeInit = false;
     }
     lblProfession.setText(context.getProfessionToGuess());

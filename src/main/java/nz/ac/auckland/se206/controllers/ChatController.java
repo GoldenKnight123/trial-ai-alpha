@@ -23,7 +23,7 @@ import nz.ac.auckland.se206.speech.TextToSpeech;
  * Controller class for the chat view. Handles user interactions and communication with the GPT
  * model via the API proxy.
  */
-public class ChatController {
+public class ChatController extends Controller {
 
   @FXML private TextArea txtaChat;
   @FXML private TextField txtInput;
@@ -85,6 +85,26 @@ public class ChatController {
   }
 
   /**
+   * Appends a chat message with typewriter effect to the chat text area.
+   *
+   * @param msg the chat message to append with typewriter effect
+   * @param delayPerCharacter delay between each character in milliseconds
+   */
+  private void appendChatMessageWithTypewriter(ChatMessage msg, double delayPerCharacter) {
+    String messageToAdd = msg.getRole() + ": " + msg.getContent() + "\n\n";
+    super.appendTextWithTypewriterEffect(txtaChat, messageToAdd, delayPerCharacter);
+  }
+
+  /**
+   * Appends a chat message with typewriter effect using default speed (30ms per character).
+   *
+   * @param msg the chat message to append with typewriter effect
+   */
+  private void appendChatMessageWithTypewriter(ChatMessage msg) {
+    appendChatMessageWithTypewriter(msg, 30); // Default 30ms per character for chat
+  }
+
+  /**
    * Runs the GPT model with a given chat message.
    *
    * @param msg the chat message to process
@@ -97,7 +117,14 @@ public class ChatController {
       ChatCompletionResult chatCompletionResult = chatCompletionRequest.execute();
       Choice result = chatCompletionResult.getChoices().iterator().next();
       chatCompletionRequest.addMessage(result.getChatMessage());
-      appendChatMessage(result.getChatMessage());
+
+      // Use typewriter effect for AI responses
+      if ("assistant".equals(result.getChatMessage().getRole())) {
+        appendChatMessageWithTypewriter(result.getChatMessage());
+      } else {
+        appendChatMessage(result.getChatMessage());
+      }
+
       TextToSpeech.speak(result.getChatMessage().getContent());
       return result.getChatMessage();
     } catch (ApiProxyException e) {
