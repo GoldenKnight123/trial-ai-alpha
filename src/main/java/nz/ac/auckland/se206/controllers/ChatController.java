@@ -94,10 +94,10 @@ public class ChatController extends Controller {
    *
    * @return the system prompt string
    */
-  private String getSystemPrompt() {
+  private String getSystemPrompt(String target) {
     Map<String, String> map = new HashMap<>();
     map.put("target", target);
-    return PromptEngineering.getPrompt("chat.txt", map);
+    return PromptEngineering.getPrompt(target, map);
   }
 
   /**
@@ -117,7 +117,8 @@ public class ChatController extends Controller {
               .setTopP(0.5)
               .setModel(Model.GPT_4_1_MINI)
               .setMaxTokens(100);
-      runGpt(new ChatMessage("system", getSystemPrompt()));
+      System.out.println(target);
+      runGpt(new ChatMessage("system", getSystemPrompt(target)));
     } catch (ApiProxyException e) {
       e.printStackTrace();
     }

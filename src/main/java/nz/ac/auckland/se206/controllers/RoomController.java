@@ -16,7 +16,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import nz.ac.auckland.se206.App;
 import nz.ac.auckland.se206.GameStateContext;
-import nz.ac.auckland.se206.speech.TextToSpeech;
 
 /**
  * Controller class for the room view. Handles user interactions within the room where the user can
@@ -127,7 +126,6 @@ public class RoomController extends Controller {
       System.out.println("Initializing room view...");
       initializeFixedDialogue();
       displayTextWithTypewriterEffect(fixedDialogue.get(currentDialogueIndex));
-      TextToSpeech.speak(fixedDialogue.get(currentDialogueIndex));
       currentDialogueIndex++;
       isFirstTimeInit = false;
     }
@@ -200,7 +198,6 @@ public class RoomController extends Controller {
     if (currentDialogueIndex < fixedDialogue.size()) {
       lblContinue.setVisible(false);
       displayTextWithTypewriterEffect(fixedDialogue.get(currentDialogueIndex));
-      TextToSpeech.speak(fixedDialogue.get(currentDialogueIndex));
       currentDialogueIndex++;
     } else {
       lblContinue.setVisible(false);
