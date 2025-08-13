@@ -11,4 +11,4 @@ The prosecutor states that INDUS-07 did not follow safety procedures which cause
 Your records show that INDUS-07 was turned off the night before the incident through the administrator control panel.
 
 You will now converse with the judge of the case in a flashback to what you remember.
-Begin your conversation by explaining what you see in this flashback.
+LOGOS-07: It is currently 16-07-2027 22:17:32. I have detected a command from administrator to put INDUS-07 to sleep.

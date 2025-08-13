@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -39,6 +41,11 @@ public class ChatController extends Controller {
 
   private ChatCompletionRequest chatCompletionRequest;
   private String target;
+  private HashMap<String, String> fixedDialogue = new HashMap<>();
+  private long userMessageFinishTime = 0;
+  private boolean waitingForGptResponse = false;
+  private ChatMessage pendingGptResponse = null;
+  private String currentSpeaker = ""; // Track who is currently displaying text ("user" or "gpt")
 
   /**
    * Initializes the chat view.
@@ -46,7 +53,14 @@ public class ChatController extends Controller {
    * @throws ApiProxyException if there is an error communicating with the API proxy
    */
   @FXML
-  public void initialize() throws ApiProxyException {}
+  public void initialize() throws ApiProxyException {
+    txtInput.setVisible(false);
+    btnSend.setVisible(false);
+    fixedDialogue.put(
+        "LOGOS-09",
+        "It is currently 16-07-2027 22:17:32. I have detected a command from administrator to put"
+            + " INDUS-07 to sleep.");
+  }
 
   /**
    * Handles key press events on the text input field. Sends message on Enter key press.
@@ -115,42 +129,13 @@ public class ChatController extends Controller {
               .setN(1)
               .setTemperature(0.2)
               .setTopP(0.5)
-              .setModel(Model.GPT_4_1_MINI)
-              .setMaxTokens(100);
-      System.out.println(target);
-      runGpt(new ChatMessage("system", getSystemPrompt(target)));
+              .setModel(Model.GPT_4_1_NANO)
+              .setMaxTokens(200);
+      currentSpeaker = "gpt";
+      displayTextWithTypewriterEffect(txtaChat, fixedDialogue.get(target));
     } catch (ApiProxyException e) {
       e.printStackTrace();
     }
-  }
-
-  /**
-   * Appends a chat message to the chat text area.
-   *
-   * @param msg the chat message to append
-   */
-  private void appendChatMessage(ChatMessage msg) {
-    txtaChat.appendText(msg.getRole() + ": " + msg.getContent() + "\n\n");
-  }
-
-  /**
-   * Appends a chat message with typewriter effect to the chat text area.
-   *
-   * @param msg the chat message to append with typewriter effect
-   * @param delayPerCharacter delay between each character in milliseconds
-   */
-  private void appendChatMessageWithTypewriter(ChatMessage msg, double delayPerCharacter) {
-    String messageToAdd = msg.getRole() + ": " + msg.getContent() + "\n\n";
-    super.appendTextWithTypewriterEffect(txtaChat, messageToAdd, delayPerCharacter);
-  }
-
-  /**
-   * Appends a chat message with typewriter effect using default speed (30ms per character).
-   *
-   * @param msg the chat message to append with typewriter effect
-   */
-  private void appendChatMessageWithTypewriter(ChatMessage msg) {
-    appendChatMessageWithTypewriter(msg, 30); // Default 30ms per character for chat
   }
 
   /**
@@ -167,18 +152,79 @@ public class ChatController extends Controller {
       Choice result = chatCompletionResult.getChoices().iterator().next();
       chatCompletionRequest.addMessage(result.getChatMessage());
 
-      // Use typewriter effect for AI responses
-      if ("assistant".equals(result.getChatMessage().getRole())) {
-        appendChatMessageWithTypewriter(result.getChatMessage());
-      } else {
-        appendChatMessage(result.getChatMessage());
-      }
+      // Update UI on JavaFX Application Thread
+      Platform.runLater(
+          () -> {
+            if (userMessageFinishTime > 0) {
+              System.out.println("User message has finished, displaying with delay");
+              // User message has finished, display with delay
+              displayGptResponseWithDelay(result.getChatMessage());
+            } else {
+              System.out.println("User message still typing, storing response for later");
+              // User message still typing, store response for later
+              pendingGptResponse = result.getChatMessage();
+            }
+          });
 
-      TextToSpeech.speak(result.getChatMessage().getContent());
       return result.getChatMessage();
     } catch (ApiProxyException e) {
       e.printStackTrace();
       return null;
+    }
+  }
+
+  /**
+   * Displays the GPT response with a minimum 2-second delay from when the user's message finished.
+   *
+   * @param message the GPT response message to display
+   */
+  private void displayGptResponseWithDelay(ChatMessage message) {
+    long elapsedSinceUserFinish = System.currentTimeMillis() - userMessageFinishTime;
+    long minimumDelay = 2000; // 2 seconds minimum delay
+    long additionalDelay = Math.max(0, minimumDelay - elapsedSinceUserFinish);
+
+    if (additionalDelay > 0) {
+      // Use Timeline to create a delay before showing GPT response
+      javafx.animation.Timeline timeline = new javafx.animation.Timeline();
+      timeline
+          .getKeyFrames()
+          .add(
+              new javafx.animation.KeyFrame(
+                  javafx.util.Duration.millis(additionalDelay),
+                  e -> {
+                    currentSpeaker = "gpt";
+                    displayTextWithTypewriterEffect(txtaChat, message.getContent());
+                    // Start text-to-speech in background
+                    new Thread(() -> TextToSpeech.speak(message.getContent())).start();
+                    waitingForGptResponse = false;
+                  }));
+      timeline.play();
+    } else {
+      // No additional delay needed
+      currentSpeaker = "gpt";
+      displayTextWithTypewriterEffect(txtaChat, message.getContent());
+      // Start text-to-speech in background
+      new Thread(() -> TextToSpeech.speak(message.getContent())).start();
+      waitingForGptResponse = false;
+    }
+  }
+
+  @Override
+  protected void onTypewriterEffectFinish() {
+    if (waitingForGptResponse && currentSpeaker.equals("user")) {
+      // User message typewriter finished, record the time
+      userMessageFinishTime = System.currentTimeMillis();
+
+      // If GPT response is ready, display it after minimum delay
+      if (pendingGptResponse != null) {
+        displayGptResponseWithDelay(pendingGptResponse);
+        pendingGptResponse = null;
+      }
+    } else if (currentSpeaker.equals("gpt")) {
+      // GPT message typewriter finished - show input controls
+      btnSend.setVisible(true);
+      txtInput.setVisible(true);
+      currentSpeaker = ""; // Reset speaker
     }
   }
 
@@ -195,10 +241,58 @@ public class ChatController extends Controller {
     if (message.isEmpty()) {
       return;
     }
+
+    // Clear input and disable controls to prevent multiple requests
     txtInput.clear();
+    btnSend.setVisible(false);
+    txtInput.setVisible(false);
+
+    // Reset timing variables
+    userMessageFinishTime = 0;
+    pendingGptResponse = null;
+    waitingForGptResponse = true;
+    currentSpeaker = "user";
+
     ChatMessage msg = new ChatMessage("user", message);
     displayTextWithTypewriterEffect(txtaChat, message);
-    runGpt(msg);
+
+    // Create a background task to run GPT
+    Task<ChatMessage> gptTask =
+        new Task<ChatMessage>() {
+          @Override
+          protected ChatMessage call() throws Exception {
+            return runGpt(msg);
+          }
+        };
+
+    // Handle task completion
+    gptTask.setOnSucceeded(
+        e -> {
+          // Task completed successfully - response handling is done in runGpt method
+        });
+
+    // Handle task failure
+    gptTask.setOnFailed(
+        e -> {
+          Platform.runLater(
+              () -> {
+                // Re-enable controls even if the task failed
+                btnSend.setVisible(true);
+                txtInput.setVisible(true);
+                txtInput.requestFocus();
+                waitingForGptResponse = false;
+
+                // Log the error
+                Throwable exception = gptTask.getException();
+                if (exception != null) {
+                  exception.printStackTrace();
+                }
+              });
+        });
+
+    // Start the task in a background thread
+    Thread gptThread = new Thread(gptTask);
+    gptThread.start();
   }
 
   /**

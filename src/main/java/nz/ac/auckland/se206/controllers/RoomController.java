@@ -123,7 +123,7 @@ public class RoomController extends Controller {
     context.setRoomController(this); // Set reference to this controller
     if (isFirstTimeInit) {
       lblContinue.setVisible(false);
-      System.out.println("Initializing room view...");
+      lblInstructions.setVisible(false);
       initializeFixedDialogue();
       displayTextWithTypewriterEffect(fixedDialogue.get(currentDialogueIndex));
       currentDialogueIndex++;
