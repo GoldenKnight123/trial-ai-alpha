@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import nz.ac.auckland.se206.controllers.ChatController;
+import nz.ac.auckland.se206.controllers.RoomController;
 
 /**
  * This is the entry point of the JavaFX application. This class initializes and runs the JavaFX
@@ -105,18 +107,24 @@ public class App extends Application {
    * @param profession the profession to set in the chat controller
    * @throws IOException if the FXML file is not found
    */
-  public static void openChat(MouseEvent event, String profession) throws IOException {
+  public static void openChat(MouseEvent event, String target) throws IOException {
     SceneControllerPair pair = loadAndCacheScene("chat");
     ChatController chatController = (ChatController) pair.getController();
-    chatController.setProfession(profession);
+    chatController.setTarget(target);
+    chatController.fadeIn();
 
     scene = pair.getScene();
     primaryStage.setScene(scene);
     primaryStage.show();
   }
 
-  public static void openRoom(MouseEvent event) throws IOException {
+  public static void openRoom(ActionEvent event) throws IOException {
     SceneControllerPair pair = loadAndCacheScene("room");
+    System.out.println("Opening room scene...");
+
+    // Ensure the room is visible when returning to it
+    RoomController roomController = (RoomController) pair.getController();
+    roomController.fadeIn();
 
     scene = pair.getScene();
     primaryStage.setScene(scene);

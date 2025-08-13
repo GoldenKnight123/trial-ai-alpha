@@ -3,6 +3,7 @@ package nz.ac.auckland.se206.controllers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -10,7 +11,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
+import nz.ac.auckland.se206.App;
 import nz.ac.auckland.se206.GameStateContext;
 import nz.ac.auckland.se206.speech.TextToSpeech;
 
@@ -25,7 +29,9 @@ public class RoomController extends Controller {
   @FXML private Rectangle rectWitnessHuman;
   @FXML private TextArea txtaDialogue;
   @FXML private Label lblContinue;
+  @FXML private Label lblInstructions;
   @FXML private Button btnGuess;
+  @FXML private Pane room;
 
   private static boolean isFirstTimeInit = true;
   private static List<String> fixedDialogue = new ArrayList<>();
@@ -76,12 +82,45 @@ public class RoomController extends Controller {
     super.displayTextWithTypewriterEffect(txtaDialogue, textToDisplay, 50);
   }
 
+  public void fadeIn() {
+    FadeTransition fadeTransition = new FadeTransition();
+    fadeTransition.setDuration(Duration.millis(1000));
+    fadeTransition.setNode(room);
+    fadeTransition.setFromValue(0.0);
+    fadeTransition.setToValue(1.0);
+    fadeTransition.play();
+  }
+
+  /** Ensures the room is visible when returning to it. */
+  public void ensureVisible() {
+    room.setOpacity(1.0);
+  }
+
+  public void fadeOut(MouseEvent event, String target) {
+    FadeTransition fadeTransition = new FadeTransition();
+    fadeTransition.setDuration(Duration.millis(1000));
+    fadeTransition.setNode(room);
+    fadeTransition.setFromValue(1.0);
+    fadeTransition.setToValue(0.0);
+
+    fadeTransition.setOnFinished(
+        e -> {
+          try {
+            App.openChat(event, target);
+          } catch (IOException ex) {
+            ex.printStackTrace();
+          }
+        });
+    fadeTransition.play();
+  }
+
   /**
    * Initializes the room view. If it's the first time initialization, it will provide instructions
    * via text-to-speech.
    */
   @FXML
   public void initialize() {
+    fadeIn();
     context.setRoomController(this); // Set reference to this controller
     if (isFirstTimeInit) {
       lblContinue.setVisible(false);
@@ -122,8 +161,11 @@ public class RoomController extends Controller {
    */
   @FXML
   private void handleRectangleClick(MouseEvent event) throws IOException {
-    Rectangle clickedRectangle = (Rectangle) event.getSource();
-    context.handleRectangleClick(event, clickedRectangle.getId());
+    // If fixed dialogue is finished and the user clicks on a rectangle, take them to the chat scene
+    // with the clicked individual as the flashback focus
+    if (currentDialogueIndex >= fixedDialogue.size()) {
+      context.handleRectangleClick(event, ((Rectangle) event.getSource()).getId());
+    }
   }
 
   /**
@@ -160,6 +202,10 @@ public class RoomController extends Controller {
       displayTextWithTypewriterEffect(fixedDialogue.get(currentDialogueIndex));
       TextToSpeech.speak(fixedDialogue.get(currentDialogueIndex));
       currentDialogueIndex++;
+    } else {
+      lblContinue.setVisible(false);
+      txtaDialogue.setVisible(false);
+      lblInstructions.setVisible(true);
     }
   }
 
@@ -170,5 +216,9 @@ public class RoomController extends Controller {
 
   public boolean isTyping() {
     return isTyping;
+  }
+
+  public Pane getRoom() {
+    return room;
   }
 }

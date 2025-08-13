@@ -15,7 +15,6 @@ public abstract class Controller {
   public boolean isTyping = false;
   private String currentFullText = ""; // Store the full text being displayed
   private TextArea currentTextArea = null; // Store the current TextArea being used
-  private boolean currentClearFirst = true; // Store whether we're clearing first
 
   /**
    * Creates a typewriter effect for displaying text in a TextArea.
@@ -35,7 +34,6 @@ public abstract class Controller {
     // Store current typewriter state
     currentTextArea = textArea;
     currentFullText = textToDisplay;
-    currentClearFirst = clearFirst;
 
     // Clear or preserve existing text
     if (clearFirst) {

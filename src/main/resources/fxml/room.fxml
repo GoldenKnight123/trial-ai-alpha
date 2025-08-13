@@ -16,7 +16,17 @@
             <Image url="@../images/person.png" />
          </image>
       </ImageView>
-      <Rectangle fx:id="rectWitnessAI" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff" focusTraversable="true" height="193.0" layoutX="196.0" layoutY="309.0" onMouseClicked="#handleRectangleClick" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="99.0" />
+      <ImageView fitHeight="223.0" fitWidth="99.0" layoutX="223.0" layoutY="389.0" preserveRatio="true">
+         <image>
+            <Image url="@../images/person.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="200.0" fitWidth="99.0" layoutX="1005.0" layoutY="389.0" preserveRatio="true">
+         <image>
+            <Image url="@../images/person.png" />
+         </image>
+      </ImageView>
+      <Rectangle fx:id="rectWitnessAI" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff" focusTraversable="true" height="193.0" layoutX="226.0" layoutY="374.0" onMouseClicked="#handleRectangleClick" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="99.0" />
       <Rectangle fx:id="rectDefendant" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff" focusTraversable="true" height="240.0" layoutX="606.0" layoutY="286.0" onMouseClicked="#handleRectangleClick" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="120.0" />
       <Rectangle fx:id="rectWitnessHuman" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff" focusTraversable="true" height="280.0" layoutX="989.0" layoutY="318.0" onMouseClicked="#handleRectangleClick" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="144.0" />
       <Label layoutX="14.0" layoutY="656.0" text="Courtroom">
@@ -35,16 +45,6 @@
             <Font size="21.0" />
          </font>
       </Label>
-      <ImageView fitHeight="223.0" fitWidth="99.0" layoutX="223.0" layoutY="389.0" preserveRatio="true">
-         <image>
-            <Image url="@../images/person.png" />
-         </image>
-      </ImageView>
-      <ImageView fitHeight="200.0" fitWidth="99.0" layoutX="1005.0" layoutY="389.0" preserveRatio="true">
-         <image>
-            <Image url="@../images/person.png" />
-         </image>
-      </ImageView>
       <Label layoutX="223.0" layoutY="352.0" text="LOGOS-09">
          <font>
             <Font size="21.0" />
@@ -61,5 +61,10 @@
          </font>
       </TextArea>
       <Label fx:id="lblContinue" layoutX="1165.0" layoutY="197.0" prefHeight="17.0" prefWidth="99.0" text="Click to continue." />
+      <Label fx:id="lblInstructions" layoutX="248.0" layoutY="80.0" text="Click on an individual to view their memories." visible="false">
+         <font>
+            <Font size="48.0" />
+         </font>
+      </Label>
    </children>
 </Pane>
