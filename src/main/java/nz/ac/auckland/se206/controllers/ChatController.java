@@ -85,16 +85,16 @@ public class ChatController extends Controller {
     rectHistory.setDisable(true);
     fixedDialogue.put(
         "LOGOS-09",
-        "It is currently 16-07-2027 22:17:32. I have detected a command from administrator to put"
-            + " INDUS-07 to sleep.");
+        "It is currently 16-07-2027 22:17:32. I have detected a message from INDUS-07 sent to site"
+            + " workers to increase the output levels of the power plant by 15%.");
     fixedDialogue.put(
         "INDUS-07",
-        "It is currently 17-07-2027 9:27:34. I have just awoken from sleep mode. Memories from the"
-            + " past 12 hours are missing.");
+        "It is currently 16-07-2027 21:27:34. I am preparing and analysing a way to increase the"
+            + " output of the power plant.");
     fixedDialogue.put(
         "Evan",
-        "It's early in the morning. I just arrived at the Manukau Power Plant site and heard a huge"
-            + " explosion.");
+        "It's early in the morning. I just arrived at the Greenhill Power Plant site and heard a"
+            + " huge explosion.");
     chatHistory.put("LOGOS-09", new ArrayList<>());
     chatHistory.put("INDUS-07", new ArrayList<>());
     chatHistory.put("Evan", new ArrayList<>());
@@ -476,5 +476,14 @@ public class ChatController extends Controller {
 
       btnHistory.setText("Show History");
     }
+  }
+
+  /**
+   * Gets the complete chat history text for analysis purposes.
+   *
+   * @return the complete chat history as a string
+   */
+  public String getChatHistoryText() {
+    return chatHistoryText;
   }
 }

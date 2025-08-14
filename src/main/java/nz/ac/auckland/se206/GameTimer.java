@@ -19,7 +19,7 @@ public class GameTimer {
 
   private static GameTimer instance;
   private Timeline timeline;
-  private int secondsLeft = 5;
+  private int secondsLeft = 120;
   private boolean isRunning = false;
   private List<Label> timerLabels = new ArrayList<>();
   private List<Arc> timerArcs = new ArrayList<>();

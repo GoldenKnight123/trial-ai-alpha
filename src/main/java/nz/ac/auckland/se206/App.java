@@ -145,6 +145,16 @@ public class App extends Application {
       debriefController.setCorrectLabel("You were INCORRECT!");
     }
 
+    // Get chat history from ChatController if available
+    String chatHistory = "";
+    if (controllerCache.containsKey("chat")) {
+      ChatController chatController = (ChatController) controllerCache.get("chat");
+      chatHistory = chatController.getChatHistoryText();
+    }
+
+    // Start GPT analysis with chat history and decision correctness
+    debriefController.runGptDebrief(chatHistory, correct);
+
     scene = pair.getScene();
     primaryStage.setScene(scene);
     primaryStage.show();

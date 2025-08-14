@@ -50,9 +50,9 @@ public class RoomController extends Controller {
         "Members of the jury - human and artificial. We shall now commence the trial of INDUS-07.");
     fixedDialogue.add(
         "The defendant is an industrial supervision AI, which the prosecution claims failed to"
-            + " prevent the Manukau Power Plant disaster.");
+            + " prevent the Greenhill Power Plant disaster.");
     fixedDialogue.add(
-        "On the morning of June 17th 2027, an explosion occurred at the Manukau Power Plant.");
+        "On the morning of June 17th 2027, an explosion occurred at the Greenhill Power Plant.");
     fixedDialogue.add(
         "Fortunately, no one was killed in the incident. But two human workers who were on duty at"
             + " the time suffered injuries.");
@@ -60,13 +60,16 @@ public class RoomController extends Controller {
         "Furthermore, the site suffered severe damage to its infrastructure and technology"
             + " systems.");
     fixedDialogue.add(
-        "INDUS-07, the defendant, is accused of negligence, as it allegedly failed to follow safety"
-            + " protocols, which would have prevented the incident.");
+        "INDUS-07, the defendant, is accused of negligence, as it decided to increase the power"
+            + " plant's output level to unsafe levels, causing the explosion.");
     fixedDialogue.add("We have two witnesses with us today.");
-    fixedDialogue.add("LOGOS-09, the AI responsible for managing the plant system operation logs.");
+    fixedDialogue.add(
+        "LOGOS-09, the AI responsible for managing the plant system message and operation logs.");
     fixedDialogue.add(
         "And Evan, one of the human workers who were present at the time of the incident.");
-    fixedDialogue.add("We will now hear what each individual has to say.");
+    fixedDialogue.add(
+        "Using the Omni-View-02, I shall analyse the memories of the witnesses and defendant to"
+            + " come to a conclusion of whether or not the defendant is guilty or innocent.");
   }
 
   /** Initialisation of guessing state */
