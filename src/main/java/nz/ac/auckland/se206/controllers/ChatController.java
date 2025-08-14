@@ -28,6 +28,7 @@ import nz.ac.auckland.apiproxy.chat.openai.Choice;
 import nz.ac.auckland.apiproxy.config.ApiProxyConfig;
 import nz.ac.auckland.apiproxy.exceptions.ApiProxyException;
 import nz.ac.auckland.se206.App;
+import nz.ac.auckland.se206.GameTimer;
 import nz.ac.auckland.se206.prompts.PromptEngineering;
 import nz.ac.auckland.se206.speech.TextToSpeech;
 
@@ -40,12 +41,14 @@ public class ChatController extends Controller {
   @FXML private TextArea txtaChat;
   @FXML private TextField txtInput;
   @FXML private Button btnSend;
+  @FXML private Button btnReturn;
   @FXML private Label lblSceneName;
   @FXML private Label lblWhoSpeaking;
   @FXML private AnchorPane chatRoom;
   @FXML private Button btnHistory;
   @FXML private TextArea txtaHistory;
   @FXML private Rectangle rectHistory;
+  @FXML private Label lblTimer;
 
   private ChatCompletionRequest chatCompletionRequest;
   private String target;
@@ -59,6 +62,7 @@ public class ChatController extends Controller {
   private String chatHistoryTextSnapShot = ""; // Store chat history text snapshot
   private boolean historyView = false;
   private boolean isAnimating = false; // Track if history animation is playing
+  private boolean isFading = false; // Track if fade animation is playing
 
   /**
    * Initializes the chat view.
@@ -67,6 +71,9 @@ public class ChatController extends Controller {
    */
   @FXML
   public void initialize() throws ApiProxyException {
+    // Register timer label with GameTimer
+    GameTimer.getInstance().registerTimerLabel(lblTimer);
+
     txtInput.setVisible(false);
     btnSend.setVisible(false);
     txtaHistory.setVisible(false);
@@ -114,6 +121,13 @@ public class ChatController extends Controller {
   }
 
   public void fadeOut(ActionEvent event) {
+    // Prevent starting a new fade if one is already in progress
+    if (isFading) {
+      return;
+    }
+
+    isFading = true; // Set flag to prevent further fade operations
+
     FadeTransition fadeTransition = new FadeTransition();
     fadeTransition.setDuration(Duration.millis(1000));
     fadeTransition.setNode(chatRoom);
@@ -122,6 +136,7 @@ public class ChatController extends Controller {
 
     fadeTransition.setOnFinished(
         e -> {
+          isFading = false; // Reset flag when fade completes
           try {
             App.openRoom(event);
           } catch (IOException ex) {
@@ -170,6 +185,7 @@ public class ChatController extends Controller {
         String message = fixedDialogue.get(target);
         chatHistory.get(target).add(new ChatMessage("assistant", message));
         chatHistoryText += target + ": " + message + "\n\n"; // Update chat history text
+        btnReturn.setDisable(true);
         displayTextWithTypewriterEffect(txtaChat, message);
       } else {
         // Find the last message sent by target in chatHistoryTextSnapShot
@@ -288,6 +304,7 @@ public class ChatController extends Controller {
       // GPT message typewriter finished - show input controls
       btnSend.setVisible(true);
       txtInput.setVisible(true);
+      btnReturn.setDisable(false);
       currentSpeaker = ""; // Reset speaker
     }
   }
@@ -310,6 +327,7 @@ public class ChatController extends Controller {
     txtInput.clear();
     btnSend.setVisible(false);
     txtInput.setVisible(false);
+    btnReturn.setDisable(true);
 
     // Reset timing variables
     userMessageFinishTime = 0;
@@ -374,6 +392,14 @@ public class ChatController extends Controller {
    */
   @FXML
   private void onGoBack(ActionEvent event) throws ApiProxyException, IOException {
+    // Prevent going back if text is still displaying, GPT is running, or fade is in progress
+    if (isTyping() || waitingForGptResponse || isFading) {
+      System.out.println(
+          "Cannot go back: Text is still displaying, GPT is processing, or fade animation is in"
+              + " progress");
+      return;
+    }
+
     fadeOut(event);
   }
 

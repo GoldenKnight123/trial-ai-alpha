@@ -6,16 +6,19 @@ import java.util.List;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Arc;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import nz.ac.auckland.se206.App;
 import nz.ac.auckland.se206.GameStateContext;
+import nz.ac.auckland.se206.GameTimer;
 
 /**
  * Controller class for the room view. Handles user interactions within the room where the user can
@@ -29,13 +32,16 @@ public class RoomController extends Controller {
   @FXML private TextArea txtaDialogue;
   @FXML private Label lblContinue;
   @FXML private Label lblInstructions;
+  @FXML private Label lblTimer;
   @FXML private Button btnGuess;
+  @FXML private Arc arcTimer;
   @FXML private Pane room;
 
   private static boolean isFirstTimeInit = true;
   private static List<String> fixedDialogue = new ArrayList<>();
   private static int currentDialogueIndex = 0;
   private static GameStateContext context = new GameStateContext();
+  private boolean isFading = false;
 
   /** Initializes the fixed dialogue options. */
   private static void initializeFixedDialogue() {
@@ -96,6 +102,13 @@ public class RoomController extends Controller {
   }
 
   public void fadeOut(MouseEvent event, String target) {
+    // Prevent starting a new fade if one is already in progress
+    if (isFading) {
+      return;
+    }
+
+    isFading = true; // Set flag to prevent further fade operations
+
     FadeTransition fadeTransition = new FadeTransition();
     fadeTransition.setDuration(Duration.millis(1000));
     fadeTransition.setNode(room);
@@ -104,6 +117,7 @@ public class RoomController extends Controller {
 
     fadeTransition.setOnFinished(
         e -> {
+          isFading = false; // Reset flag when fade completes
           try {
             App.openChat(event, target);
           } catch (IOException ex) {
@@ -121,6 +135,15 @@ public class RoomController extends Controller {
   public void initialize() {
     fadeIn();
     context.setRoomController(this); // Set reference to this controller
+
+    lblTimer.setVisible(false);
+    lblTimer.setAlignment(Pos.CENTER);
+    arcTimer.setVisible(false);
+
+    // Register timer label and start timer if this is the first initialization
+    GameTimer.getInstance().registerTimerLabel(lblTimer);
+    GameTimer.getInstance().registerTimerArc(arcTimer);
+
     if (isFirstTimeInit) {
       lblContinue.setVisible(false);
       lblInstructions.setVisible(false);
@@ -159,6 +182,12 @@ public class RoomController extends Controller {
    */
   @FXML
   private void handleRectangleClick(MouseEvent event) throws IOException {
+    // Prevent rectangle clicks if fade animation is playing
+    if (isFading) {
+      System.out.println("Cannot click rectangle: Fade animation is in progress");
+      return;
+    }
+
     // If fixed dialogue is finished and the user clicks on a rectangle, take them to the chat scene
     // with the clicked individual as the flashback focus
     if (currentDialogueIndex >= fixedDialogue.size()) {
@@ -203,6 +232,9 @@ public class RoomController extends Controller {
       lblContinue.setVisible(false);
       txtaDialogue.setVisible(false);
       lblInstructions.setVisible(true);
+      lblTimer.setVisible(true);
+      arcTimer.setVisible(true);
+      GameTimer.getInstance().start();
     }
   }
 

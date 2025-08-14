@@ -5,30 +5,37 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Arc?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="chatRoom" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nz.ac.auckland.se206.controllers.ChatController">
   <children>
-    <TextArea fx:id="txtaChat" editable="false" layoutX="33.0" layoutY="382.0" prefHeight="299.0" prefWidth="1214.0" wrapText="true">
+    <TextArea fx:id="txtaChat" editable="false" layoutX="33.0" layoutY="345.0" prefHeight="299.0" prefWidth="1214.0" wrapText="true">
          <font>
             <Font size="24.0" />
          </font></TextArea>
-    <TextField fx:id="txtInput" layoutX="35.0" layoutY="287.0" onKeyPressed="#onKeyPressed" prefHeight="26.0" prefWidth="1087.0" promptText="Enter your message here..." />
-    <Button fx:id="btnSend" layoutX="1148.0" layoutY="287.0" mnemonicParsing="false" onAction="#onSendMessage" prefHeight="26.0" prefWidth="97.0" text="Send" />
-    <Button layoutX="961.0" layoutY="17.0" mnemonicParsing="false" onAction="#onGoBack" prefHeight="44.0" prefWidth="143.0" text="Go Back to Courtroom" />
-      <Label fx:id="lblSceneName" layoutX="9.0" layoutY="3.0" text="Flashback">
+    <TextField fx:id="txtInput" layoutX="35.0" layoutY="250.0" onKeyPressed="#onKeyPressed" prefHeight="26.0" prefWidth="1087.0" promptText="Enter your message here..." />
+    <Button fx:id="btnSend" layoutX="1148.0" layoutY="250.0" mnemonicParsing="false" onAction="#onSendMessage" prefHeight="26.0" prefWidth="97.0" text="Send" />
+    <Button fx:id="btnReturn" layoutX="961.0" layoutY="17.0" mnemonicParsing="false" onAction="#onGoBack" prefHeight="44.0" prefWidth="143.0" text="Go Back to Courtroom" />
+      <Label fx:id="lblSceneName" layoutX="13.0" layoutY="663.0" text="Flashback">
          <font>
             <Font size="36.0" />
          </font>
       </Label>
-      <Label fx:id="lblWhoSpeaking" layoutX="33.0" layoutY="346.0" text="You:">
+      <Label fx:id="lblWhoSpeaking" layoutX="33.0" layoutY="309.0" text="You:">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <Rectangle fx:id="rectHistory" arcHeight="5.0" arcWidth="5.0" height="728.0" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="1287.0" />
+      <Rectangle fx:id="rectHistory" arcHeight="5.0" arcWidth="5.0" height="720.0" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="1280.0" />
       <TextArea fx:id="txtaHistory" editable="false" layoutX="808.0" layoutY="72.0" prefHeight="620.0" prefWidth="444.0" visible="false" wrapText="true" />
       <Button fx:id="btnHistory" layoutX="1116.0" layoutY="17.0" mnemonicParsing="false" onAction="#toggleHistory" prefHeight="44.0" prefWidth="143.0" text="Show History" />
+      <Label fx:id="lblTimer" alignment="CENTER" layoutX="14.0" layoutY="14.0" text="120" textFill="#000000">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Arc fx:id="arcTimer" layoutX="35.0" layoutY="35.0" length="360.0" opacity="0.25" radiusX="30.0" radiusY="30.0" startAngle="90.0" stroke="BLACK" strokeType="INSIDE" type="ROUND" />
   </children>
 </AnchorPane>
