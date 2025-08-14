@@ -1,6 +1,7 @@
 package nz.ac.auckland.se206.controllers;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +21,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.media.AudioClip;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
 import nz.ac.auckland.apiproxy.chat.openai.ChatCompletionRequest;
 import nz.ac.auckland.apiproxy.chat.openai.ChatCompletionRequest.Model;
 import nz.ac.auckland.apiproxy.chat.openai.ChatCompletionResult;
@@ -30,6 +34,8 @@ import nz.ac.auckland.apiproxy.chat.openai.ChatMessage;
 import nz.ac.auckland.apiproxy.chat.openai.Choice;
 import nz.ac.auckland.apiproxy.config.ApiProxyConfig;
 import nz.ac.auckland.apiproxy.exceptions.ApiProxyException;
+import nz.ac.auckland.apiproxy.tts.TextToSpeechRequest.Provider;
+import nz.ac.auckland.apiproxy.tts.TextToSpeechRequest.Voice;
 import nz.ac.auckland.se206.App;
 import nz.ac.auckland.se206.GameTimer;
 import nz.ac.auckland.se206.prompts.PromptEngineering;
@@ -61,6 +67,8 @@ public class ChatController extends Controller {
   private long userMessageFinishTime = 0;
   private boolean waitingForGptResponse = false;
   private ChatMessage pendingGptResponse = null;
+  private Player storedTts = null;
+  private Thread ttsThread = null;
   private String currentSpeaker = ""; // Track who is currently displaying text ("user" or "gpt")
   private HashMap<String, List<ChatMessage>> chatHistory = new HashMap<>();
   private String chatHistoryText = ""; // Store chat history text
@@ -89,11 +97,11 @@ public class ChatController extends Controller {
     rectHistory.setDisable(true);
     fixedDialogue.put(
         "LOGOS-09",
-        "It is currently 16-07-2027 22:17:32. I have detected a message from INDUS-07 sent to site"
+        "It is currently 16th July 22:17AM. I have detected a message from INDUS-07 sent to site"
             + " workers to increase the output levels of the power plant by 15%.");
     fixedDialogue.put(
         "INDUS-07",
-        "It is currently 16-07-2027 21:27:34. I am preparing and analysing a way to increase the"
+        "It is currently 16th July 21:27AM. I am preparing and analysing a way to increase the"
             + " output of the power plant.");
     fixedDialogue.put(
         "Evan",
@@ -182,6 +190,12 @@ public class ChatController extends Controller {
               .setTopP(0.5)
               .setModel(Model.GPT_4o_MINI)
               .setMaxTokens(200);
+
+      // Add the system prompt and chat history snapshot with all "You" replaced with "Judge"
+      chatCompletionRequest.addMessage(
+          new ChatMessage(
+              "system", getSystemPrompt(target) + chatHistoryTextSnapShot.replace("You", "Judge")));
+
       currentSpeaker = "gpt";
       lblWhoSpeaking.setText(target + ":");
 
@@ -190,6 +204,11 @@ public class ChatController extends Controller {
         txtInput.setVisible(false);
         btnSend.setVisible(false);
         String message = fixedDialogue.get(target);
+        // get the audio file and play it using the target name in sounds folder
+        AudioClip voiceLine =
+            new AudioClip(
+                App.class.getResource("/sounds/" + target + "_flashback.mp3").toExternalForm());
+        voiceLine.play();
         chatHistory.get(target).add(new ChatMessage("assistant", message));
         chatHistoryText += target + ": " + message + "\n\n"; // Update chat history text
         btnReturn.setDisable(true);
@@ -213,33 +232,54 @@ public class ChatController extends Controller {
    * @param msg the chat message to process
    * @return the response chat message
    * @throws ApiProxyException if there is an error communicating with the API proxy
+   * @throws IOException
+   * @throws MalformedURLException
+   * @throws JavaLayerException
    */
-  private ChatMessage runGpt(ChatMessage msg) throws ApiProxyException {
-    // Add the system prompt and chat history snapshot with all "You" replaced with "Judge"
-    chatCompletionRequest.addMessage(
-        new ChatMessage(
-            "system", getSystemPrompt(target) + chatHistoryTextSnapShot.replace("You", "Judge")));
-
-    // Add all messages from the chat history
-    for (ChatMessage message : chatHistory.get(target)) {
-      chatCompletionRequest.addMessage(message);
-    }
-
+  private ChatMessage runGpt(ChatMessage msg)
+      throws ApiProxyException, MalformedURLException, IOException, JavaLayerException {
     try {
       ChatCompletionResult chatCompletionResult = chatCompletionRequest.execute();
       Choice result = chatCompletionResult.getChoices().iterator().next();
-      chatCompletionRequest.addMessage(result.getChatMessage());
+
+      Voice voice = null;
+      switch (target) {
+        case "LOGOS-09":
+          voice = Voice.OPENAI_SAGE;
+          break;
+        case "INDUS-07":
+          voice = Voice.OPENAI_ONYX;
+          break;
+        case "Evan":
+          voice = Voice.OPENAI_ASH;
+          break;
+      }
+
+      storedTts = TextToSpeech.speak(result.getChatMessage().getContent(), Provider.OPENAI, voice);
+
+      // Start a new thread to play the TTS audio
+      ttsThread =
+          new Thread(
+              () -> {
+                try {
+                  storedTts.play();
+                } catch (JavaLayerException e) {
+                  e.printStackTrace();
+                }
+              });
 
       // Update UI on JavaFX Application Thread
       Platform.runLater(
           () -> {
             // Add message to history
             chatHistory.get(target).add(result.getChatMessage());
+            chatCompletionRequest.addMessage(result.getChatMessage());
             chatHistoryText +=
                 target
                     + ": "
                     + result.getChatMessage().getContent()
                     + "\n\n"; // Update chat history text
+
             if (userMessageFinishTime > 0) {
               System.out.println("User message has finished, displaying with delay");
               // User message has finished, display with delay
@@ -280,9 +320,8 @@ public class ChatController extends Controller {
                     currentSpeaker = "gpt";
                     lblWhoSpeaking.setText(target + ":");
                     stopThinkingAnimation();
+                    ttsThread.start();
                     displayTextWithTypewriterEffect(txtaChat, message.getContent());
-                    // Start text-to-speech in background
-                    new Thread(() -> TextToSpeech.speak(message.getContent())).start();
                     waitingForGptResponse = false;
                   }));
       timeline.play();
@@ -291,9 +330,8 @@ public class ChatController extends Controller {
       currentSpeaker = "gpt";
       lblWhoSpeaking.setText(target + ":");
       stopThinkingAnimation();
+      ttsThread.start();
       displayTextWithTypewriterEffect(txtaChat, message.getContent());
-      // Start text-to-speech in background
-      new Thread(() -> TextToSpeech.speak(message.getContent())).start();
       waitingForGptResponse = false;
     }
   }
@@ -352,7 +390,9 @@ public class ChatController extends Controller {
     chatHistory.get(target).add(msg);
     chatHistoryText += "You: " + msg.getContent() + "\n"; // Update chat history text
 
-    displayTextWithTypewriterEffect(txtaChat, message);
+    chatCompletionRequest.addMessage(msg);
+
+    displayTextWithTypewriterEffect(txtaChat, message, 50, true, true);
 
     // Create a background task to run GPT
     Task<ChatMessage> gptTask =
@@ -362,12 +402,6 @@ public class ChatController extends Controller {
             return runGpt(msg);
           }
         };
-
-    // Handle task completion
-    gptTask.setOnSucceeded(
-        e -> {
-          // Task completed successfully - response handling is done in runGpt method
-        });
 
     // Handle task failure
     gptTask.setOnFailed(

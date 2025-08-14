@@ -27,7 +27,7 @@
             <Image url="@../images/person.png" />
          </image>
       </ImageView>
-      <Rectangle fx:id="rectWitnessAI" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff" focusTraversable="true" height="193.0" layoutX="226.0" layoutY="374.0" onMouseClicked="#handleRectangleClick" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="99.0" />
+      <Rectangle fx:id="rectWitnessAi" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff" focusTraversable="true" height="193.0" layoutX="226.0" layoutY="374.0" onMouseClicked="#handleRectangleClick" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="99.0" />
       <Rectangle fx:id="rectDefendant" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff" focusTraversable="true" height="240.0" layoutX="606.0" layoutY="286.0" onMouseClicked="#handleRectangleClick" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="120.0" />
       <Rectangle fx:id="rectWitnessHuman" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff" focusTraversable="true" height="280.0" layoutX="989.0" layoutY="318.0" onMouseClicked="#handleRectangleClick" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="144.0" />
       <Label layoutX="14.0" layoutY="656.0" text="Courtroom">

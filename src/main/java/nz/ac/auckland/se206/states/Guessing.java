@@ -4,7 +4,6 @@ import java.io.IOException;
 import javafx.scene.input.MouseEvent;
 import nz.ac.auckland.se206.GameStateContext;
 import nz.ac.auckland.se206.controllers.RoomController;
-import nz.ac.auckland.se206.speech.TextToSpeech;
 
 /**
  * The Guessing state of the game. Handles the logic for when the player is making a guess about the
@@ -44,13 +43,8 @@ public class Guessing implements GameState {
    */
   @Override
   public void handleGuessClick() throws IOException {
-    String message = "You have already guessed!";
-    RoomController roomController = context.getRoomController();
-
-    if (roomController != null) {
-      roomController.displayTextWithTypewriterEffect(message);
-    }
-    TextToSpeech.speak(message);
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'handleGuessClick'");
   }
 
   @Override

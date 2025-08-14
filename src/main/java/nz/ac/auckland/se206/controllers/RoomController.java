@@ -29,38 +29,58 @@ public class RoomController extends Controller {
   private static List<String> fixedDialogue = new ArrayList<>();
   private static int currentDialogueIndex = 0;
   private static GameStateContext context = new GameStateContext();
-  private boolean isFading = false;
-  private boolean isGuessing = false;
 
-  /** Initializes introductory dialogue for the trial. Each line is a separate item in the list. */
+  /**
+   * Initializes introductory dialogue for the trial. Each line is a separate item in the list. It
+   * will be displayed one by one and is handled by the displayNextLine method
+   */
   private static void initializeFixedDialogue() {
+    // Introduction
     fixedDialogue.add(
         "Members of the jury - human and artificial. We shall now commence the trial of INDUS-07.");
+
+    // Introducing defendant
     fixedDialogue.add(
         "The defendant is an industrial supervision AI, which the prosecution claims failed to"
             + " prevent the Greenhill Power Plant disaster.");
+
+    // Explaining the incident
     fixedDialogue.add(
         "On the morning of June 17th 2027, an explosion occurred at the Greenhill Power Plant.");
+
+    // Incident consequences
     fixedDialogue.add(
         "Fortunately, no one was killed in the incident. But two human workers who were on duty at"
             + " the time suffered injuries.");
+
+    // Incident consequences
     fixedDialogue.add(
         "Furthermore, the site suffered severe damage to its infrastructure and technology"
             + " systems.");
+
+    // What the defendant is accused of in regards to the incident
     fixedDialogue.add(
         "INDUS-07, the defendant, is accused of negligence, as it decided to increase the power"
             + " plant's output level to unsafe levels, causing the explosion.");
+
+    // Introducing witnesses
     fixedDialogue.add("We have two witnesses with us today.");
+
+    // Introducing LOGOS-09
     fixedDialogue.add(
         "LOGOS-09, the AI responsible for managing the plant system message and operation logs.");
+
+    // Introducing Evan
     fixedDialogue.add(
         "And Evan, one of the human workers who were present at the time of the incident.");
+
+    // Explaining how we will analyse the memories
     fixedDialogue.add(
         "Using the Omni-View-02, I shall analyse the memories of the witnesses and defendant to"
             + " come to a conclusion of whether or not the defendant is guilty or innocent.");
   }
 
-  @FXML private Rectangle rectWitnessAI;
+  @FXML private Rectangle rectWitnessAi;
   @FXML private Rectangle rectDefendant;
   @FXML private Rectangle rectWitnessHuman;
   @FXML private TextArea txtaDialogue;
@@ -72,7 +92,9 @@ public class RoomController extends Controller {
   @FXML private Arc arcTimer;
   @FXML private Pane room;
 
-  /** Initialisation of guessing state */
+  private boolean isFading = false;
+  private boolean isGuessing = false;
+
   public void initializeGuessingState() {
     txtaDialogue.setVisible(true);
     lblContinue.setVisible(false);
@@ -95,28 +117,10 @@ public class RoomController extends Controller {
     fixedDialogue.add("I have finished analysing the memories of the witness and defendants.");
     fixedDialogue.add("I shall now decide if defendant is GUILTY or NOT GUILTY.");
     currentDialogueIndex = 0;
-    displayTextWithTypewriterEffect(fixedDialogue.get(currentDialogueIndex));
+    displayTextWithTypewriterEffect(
+        txtaDialogue, fixedDialogue.get(currentDialogueIndex), 50, true, true);
     currentDialogueIndex++;
     isGuessing = true;
-  }
-
-  /**
-   * Creates a typewriter effect for displaying text in the dialogue area.
-   *
-   * @param textToDisplay the text to display with typewriter effect
-   * @param delayPerCharacter delay between each character in milliseconds
-   */
-  public void displayTextWithTypewriterEffect(String textToDisplay, double delayPerCharacter) {
-    super.displayTextWithTypewriterEffect(txtaDialogue, textToDisplay, delayPerCharacter);
-  }
-
-  /**
-   * Displays text with typewriter effect using default speed (50ms per character).
-   *
-   * @param textToDisplay the text to display with typewriter effect
-   */
-  public void displayTextWithTypewriterEffect(String textToDisplay) {
-    super.displayTextWithTypewriterEffect(txtaDialogue, textToDisplay, 50);
   }
 
   public void fadeIn() {
@@ -194,7 +198,8 @@ public class RoomController extends Controller {
       lblContinue.setVisible(false);
       lblInstructions.setVisible(false);
       initializeFixedDialogue();
-      displayTextWithTypewriterEffect(fixedDialogue.get(currentDialogueIndex));
+      displayTextWithTypewriterEffect(
+          txtaDialogue, fixedDialogue.get(currentDialogueIndex), 50, true, true);
       currentDialogueIndex++;
       isFirstTimeInit = false;
     }
@@ -279,7 +284,8 @@ public class RoomController extends Controller {
   public void displayNextLine() {
     if (currentDialogueIndex < fixedDialogue.size()) {
       lblContinue.setVisible(false);
-      displayTextWithTypewriterEffect(fixedDialogue.get(currentDialogueIndex));
+      displayTextWithTypewriterEffect(
+          txtaDialogue, fixedDialogue.get(currentDialogueIndex), 50, true, true);
       currentDialogueIndex++;
     } else if (!isGuessing) {
       lblContinue.setVisible(false);

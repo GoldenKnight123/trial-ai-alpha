@@ -17,6 +17,8 @@ public class GameTimer {
     void onTimerExpired();
   }
 
+  private static GameTimer instance;
+
   /**
    * Gets the singleton instance of the GameTimer.
    *
@@ -29,7 +31,6 @@ public class GameTimer {
     return instance;
   }
 
-  private static GameTimer instance;
   private Timeline timeline;
   private int secondsLeft = 120;
   private int maxTime = 120;

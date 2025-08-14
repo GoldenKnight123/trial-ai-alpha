@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "TempTTSGenerator",
+      "request": "launch",
+      "mainClass": "nz.ac.auckland.se206.TempTTSGenerator",
+      "projectName": "trial-ai-alpha"
+    },
+    {
+      "type": "java",
       "name": "App",
       "request": "launch",
       "mainClass": "nz.ac.auckland.se206.App",

@@ -90,10 +90,15 @@ public class DebriefController extends Controller {
    */
   private String buildAnalysisPrompt(String chatHistory, boolean wasCorrect) {
     StringBuilder prompt = new StringBuilder();
+    // Added context
     prompt.append(
         "You are an expert trial analyst. Analyze the following conversation between a judge and"
             + " characters in a trial simulation.\n\n");
+
+    // Added chat history
     prompt.append("Chat History:\n").append(chatHistory).append("\n\n");
+
+    // If the judge was correct then we give positive feedback
     if (wasCorrect) {
       prompt.append(
           "The judge made a CORRECT decision. That INDUS-07 was not responsible for the explosion,"
@@ -101,7 +106,7 @@ public class DebriefController extends Controller {
               + " of being fired. Explain why their decision was right based on the evidence and"
               + " conversations shown. Highlight key pieces of evidence or character responses that"
               + " supported the correct verdict.");
-    } else {
+    } else { // If the judge was incorrect then we give negative feedback
       prompt.append(
           "The judge made an INCORRECT decision. That INDUS-07 was responsible for the explosion"
               + " even though it was the higher ups that pressured it to increase output under the"
@@ -109,6 +114,8 @@ public class DebriefController extends Controller {
               + " and conversations shown. Highlight key pieces of evidence or character responses"
               + " that they may have missed or misinterpreted.");
     }
+
+    // Added focus on specific details
     prompt.append(
         "Focus on specific details from the conversations that were crucial to determining guilt or"
             + " innocence.");
