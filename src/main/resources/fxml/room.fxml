@@ -55,7 +55,7 @@
             <Font size="21.0" />
          </font>
       </Label>
-      <TextArea fx:id="txtaDialogue" editable="false" layoutX="16.0" layoutY="14.0" prefHeight="200.0" prefWidth="1248.0" text="Text Here" wrapText="true">
+      <TextArea fx:id="txtaDialogue" editable="false" layoutX="76.0" layoutY="14.0" prefHeight="200.0" prefWidth="1188.0" text="Text Here" wrapText="true">
          <font>
             <Font size="24.0" />
          </font>

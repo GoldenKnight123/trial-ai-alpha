@@ -74,11 +74,23 @@ public class RoomController extends Controller {
 
   /** Initialisation of guessing state */
   public void initializeGuessingState() {
-    lblTimer.setVisible(false);
-    arcTimer.setVisible(false);
     txtaDialogue.setVisible(true);
     lblContinue.setVisible(false);
     lblInstructions.setVisible(false);
+    lblTimer.setVisible(true);
+    arcTimer.setVisible(true);
+    GameTimer.getInstance().setMaxTime(10);
+    GameTimer.getInstance().updateTimerDisplay();
+    GameTimer.getInstance().start();
+    GameTimer.getInstance()
+        .setOnTimerExpired(
+            () -> {
+              try {
+                onChooseGuilty(null);
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
+            });
     fixedDialogue.clear();
     fixedDialogue.add("I have finished analysing the memories of the witness and defendants.");
     fixedDialogue.add("I shall now decide if defendant is GUILTY or NOT GUILTY.");
@@ -165,9 +177,11 @@ public class RoomController extends Controller {
     fadeIn();
     context.setRoomController(this); // Set reference to this controller
 
-    lblTimer.setVisible(false);
     lblTimer.setAlignment(Pos.CENTER);
-    arcTimer.setVisible(false);
+
+    lblTimer.setVisible(true);
+    arcTimer.setVisible(true);
+    GameTimer.getInstance().start();
 
     btnGuilty.setVisible(false);
     btnNotGuilty.setVisible(false);
@@ -271,21 +285,12 @@ public class RoomController extends Controller {
       lblContinue.setVisible(false);
       txtaDialogue.setVisible(false);
       lblInstructions.setVisible(true);
-      lblTimer.setVisible(true);
-      arcTimer.setVisible(true);
-      GameTimer.getInstance().start();
       context.setState(context.getGameStartedState());
     } else {
       lblContinue.setVisible(false);
       txtaDialogue.setVisible(false);
       btnGuilty.setVisible(true);
       btnNotGuilty.setVisible(true);
-      lblTimer.setVisible(true);
-      arcTimer.setVisible(true);
-      GameTimer.getInstance().setMaxTime(10);
-      GameTimer.getInstance().updateTimerDisplay();
-      GameTimer.getInstance().start();
-      GameTimer.getInstance().setOnTimerExpired(null);
     }
   }
 
