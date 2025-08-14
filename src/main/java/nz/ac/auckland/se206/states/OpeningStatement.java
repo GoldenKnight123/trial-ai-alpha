@@ -20,27 +20,8 @@ public class OpeningStatement implements GameState {
 
   @Override
   public void handleRectangleClick(MouseEvent event, String rectangleId) throws IOException {
-    // Take the user to the chat scene with the clicked individual as the flashback focus
-    RoomController roomController = context.getRoomController();
-
-    System.out.println("Clicked rectangle ID: " + rectangleId);
-
-    switch (rectangleId) {
-      case "rectWitnessAI":
-        System.out.println("Clicked on AI witness rectangle");
-        roomController.fadeOut(event, "LOGOS-09");
-        break;
-
-      case "rectWitnessHuman":
-        System.out.println("Clicked on Human witness rectangle");
-        roomController.fadeOut(event, "Evan");
-        break;
-
-      case "rectDefendant":
-        System.out.println("Clicked on Defendant rectangle");
-        roomController.fadeOut(event, "INDUS-07");
-        break;
-    }
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'handleRectangleClick'");
   }
 
   @Override

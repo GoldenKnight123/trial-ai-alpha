@@ -12,12 +12,18 @@ import javafx.util.Duration;
 /** This class manages a game timer that can be displayed on multiple UI labels. */
 public class GameTimer {
 
+  /** Callback interface for when the timer runs out. */
+  public interface TimerExpiredCallback {
+    void onTimerExpired();
+  }
+
   private static GameTimer instance;
   private Timeline timeline;
-  private int secondsLeft = 120;
+  private int secondsLeft = 5;
   private boolean isRunning = false;
   private List<Label> timerLabels = new ArrayList<>();
   private List<Arc> timerArcs = new ArrayList<>();
+  private TimerExpiredCallback expiredCallback;
 
   private GameTimer() {
     initializeTimer();
@@ -46,6 +52,10 @@ public class GameTimer {
                   updateTimerDisplay();
                   if (secondsLeft <= 0) {
                     stop();
+                    // Call the callback when timer expires
+                    if (expiredCallback != null) {
+                      Platform.runLater(() -> expiredCallback.onTimerExpired());
+                    }
                   }
                 }));
     timeline.setCycleCount(Timeline.INDEFINITE);
@@ -65,6 +75,20 @@ public class GameTimer {
       timeline.stop();
       isRunning = false;
     }
+  }
+
+  /** Get the time left */
+  public int getTimeLeft() {
+    return secondsLeft;
+  }
+
+  /**
+   * Sets the callback to be called when the timer expires.
+   *
+   * @param callback the callback to execute when timer runs out
+   */
+  public void setOnTimerExpired(TimerExpiredCallback callback) {
+    this.expiredCallback = callback;
   }
 
   /**
@@ -97,8 +121,7 @@ public class GameTimer {
 
   /** Updates all registered timer labels with the current time. */
   private void updateTimerDisplay() {
-    String timeString =
-        String.format("%3d", secondsLeft); // Format with 3 characters, right-aligned
+    String timeString = String.format("%3d", secondsLeft);
     Platform.runLater(
         () -> {
           for (Label label : timerLabels) {

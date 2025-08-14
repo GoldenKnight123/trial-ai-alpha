@@ -10,7 +10,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Arc;
@@ -33,7 +32,8 @@ public class RoomController extends Controller {
   @FXML private Label lblContinue;
   @FXML private Label lblInstructions;
   @FXML private Label lblTimer;
-  @FXML private Button btnGuess;
+  @FXML private Button btnGuilty;
+  @FXML private Button btnNotGuilty;
   @FXML private Arc arcTimer;
   @FXML private Pane room;
 
@@ -42,8 +42,9 @@ public class RoomController extends Controller {
   private static int currentDialogueIndex = 0;
   private static GameStateContext context = new GameStateContext();
   private boolean isFading = false;
+  private boolean isGuessing = false;
 
-  /** Initializes the fixed dialogue options. */
+  /** Initialises the fixed dialogue options. */
   private static void initializeFixedDialogue() {
     fixedDialogue.add(
         "Members of the jury - human and artificial. We shall now commence the trial of INDUS-07.");
@@ -66,6 +67,22 @@ public class RoomController extends Controller {
     fixedDialogue.add(
         "And Evan, one of the human workers who were present at the time of the incident.");
     fixedDialogue.add("We will now hear what each individual has to say.");
+  }
+
+  /** Initialisation of guessing state */
+  public void initializeGuessingState() {
+    lblTimer.setVisible(false);
+    arcTimer.setVisible(false);
+    txtaDialogue.setVisible(true);
+    lblContinue.setVisible(false);
+    lblInstructions.setVisible(false);
+    fixedDialogue.clear();
+    fixedDialogue.add("I have finished analysing the memories of the witness and defendants.");
+    fixedDialogue.add("I shall now decide if defendant is GUILTY or NOT GUILTY.");
+    currentDialogueIndex = 0;
+    displayTextWithTypewriterEffect(fixedDialogue.get(currentDialogueIndex));
+    currentDialogueIndex++;
+    isGuessing = true;
   }
 
   /**
@@ -93,6 +110,15 @@ public class RoomController extends Controller {
     fadeTransition.setNode(room);
     fadeTransition.setFromValue(0.0);
     fadeTransition.setToValue(1.0);
+
+    fadeTransition.setOnFinished(
+        e -> {
+          isFading = false; // Reset flag when fade completes
+          if (GameTimer.getInstance().getTimeLeft() <= 0) {
+            context.setState(context.getGuessingState());
+          }
+        });
+
     fadeTransition.play();
   }
 
@@ -140,6 +166,9 @@ public class RoomController extends Controller {
     lblTimer.setAlignment(Pos.CENTER);
     arcTimer.setVisible(false);
 
+    btnGuilty.setVisible(false);
+    btnNotGuilty.setVisible(false);
+
     // Register timer label and start timer if this is the first initialization
     GameTimer.getInstance().registerTimerLabel(lblTimer);
     GameTimer.getInstance().registerTimerArc(arcTimer);
@@ -152,26 +181,6 @@ public class RoomController extends Controller {
       currentDialogueIndex++;
       isFirstTimeInit = false;
     }
-  }
-
-  /**
-   * Handles the key pressed event.
-   *
-   * @param event the key event
-   */
-  @FXML
-  public void onKeyPressed(KeyEvent event) {
-    System.out.println("Key " + event.getCode() + " pressed");
-  }
-
-  /**
-   * Handles the key released event.
-   *
-   * @param event the key event
-   */
-  @FXML
-  public void onKeyReleased(KeyEvent event) {
-    System.out.println("Key " + event.getCode() + " released");
   }
 
   /**
@@ -217,9 +226,32 @@ public class RoomController extends Controller {
     context.handleGeneralClick();
   }
 
+  /**
+   * Handles mouse click on GUILTY button
+   *
+   * @param event the mouse event triggered by clicking in the game area
+   * @throws IOException if there is an I/O error
+   */
+  @FXML
+  private void onChooseGuilty(ActionEvent event) throws IOException {
+    App.openDebrief(null, false);
+  }
+
+  /**
+   * Handles mouse click on GUILTY button
+   *
+   * @param event the mouse event triggered by clicking in the game area
+   * @throws IOException if there is an I/O error
+   */
+  @FXML
+  private void onChooseNotGuilty(ActionEvent event) throws IOException {
+    App.openDebrief(null, true);
+  }
+
   @Override
   protected void onTypewriterEffectFinish() {
     // Show the continue label when the typewriter effect finishes
+    System.out.println("finished line");
     lblContinue.setVisible(true);
   }
 
@@ -228,13 +260,19 @@ public class RoomController extends Controller {
       lblContinue.setVisible(false);
       displayTextWithTypewriterEffect(fixedDialogue.get(currentDialogueIndex));
       currentDialogueIndex++;
-    } else {
+    } else if (!isGuessing) {
       lblContinue.setVisible(false);
       txtaDialogue.setVisible(false);
       lblInstructions.setVisible(true);
       lblTimer.setVisible(true);
       arcTimer.setVisible(true);
       GameTimer.getInstance().start();
+      context.setState(context.getGameStartedState());
+    } else {
+      lblContinue.setVisible(false);
+      txtaDialogue.setVisible(false);
+      btnGuilty.setVisible(true);
+      btnNotGuilty.setVisible(true);
     }
   }
 
@@ -249,5 +287,13 @@ public class RoomController extends Controller {
 
   public Pane getRoom() {
     return room;
+  }
+
+  public GameStateContext getContext() {
+    return context;
+  }
+
+  public Boolean isGuessing() {
+    return isGuessing;
   }
 }

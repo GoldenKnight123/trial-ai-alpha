@@ -18,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Arc;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import nz.ac.auckland.apiproxy.chat.openai.ChatCompletionRequest;
@@ -49,6 +50,7 @@ public class ChatController extends Controller {
   @FXML private TextArea txtaHistory;
   @FXML private Rectangle rectHistory;
   @FXML private Label lblTimer;
+  @FXML private Arc arcTimer;
 
   private ChatCompletionRequest chatCompletionRequest;
   private String target;
@@ -73,6 +75,7 @@ public class ChatController extends Controller {
   public void initialize() throws ApiProxyException {
     // Register timer label with GameTimer
     GameTimer.getInstance().registerTimerLabel(lblTimer);
+    GameTimer.getInstance().registerTimerArc(arcTimer);
 
     txtInput.setVisible(false);
     btnSend.setVisible(false);

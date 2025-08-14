@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import nz.ac.auckland.se206.controllers.ChatController;
+import nz.ac.auckland.se206.controllers.DebriefController;
 import nz.ac.auckland.se206.controllers.RoomController;
 
 /**
@@ -131,6 +132,51 @@ public class App extends Application {
     primaryStage.show();
   }
 
+  public static void openDebrief(ActionEvent event, boolean correct) throws IOException {
+    SceneControllerPair pair = loadAndCacheScene("debrief");
+    System.out.println("Opening debrief scene...");
+
+    // Ensure the debrief is visible when returning to it
+    DebriefController debriefController = (DebriefController) pair.getController();
+
+    if (correct) {
+      debriefController.setCorrectLabel("You were CORRECT!");
+    } else {
+      debriefController.setCorrectLabel("You were INCORRECT!");
+    }
+
+    scene = pair.getScene();
+    primaryStage.setScene(scene);
+    primaryStage.show();
+  }
+
+  /** Forces the user back to the room scene (used when timer expires). */
+  public static void forceReturnToRoom() {
+    try {
+      if (primaryStage.getScene().getRoot().getId().equals("room")) {
+        SceneControllerPair roomPair = loadAndCacheScene("room");
+        RoomController roomController = (RoomController) roomPair.getController();
+        System.out.println("setting context to guessing state");
+        roomController.getContext().setState(roomController.getContext().getGuessingState());
+        roomController.initializeGuessingState();
+        return;
+      }
+
+      SceneControllerPair pair = loadAndCacheScene("chat");
+
+      ChatController chatController = (ChatController) pair.getController();
+      chatController.fadeOut(null);
+
+      SceneControllerPair roomPair = loadAndCacheScene("room");
+      RoomController roomController = (RoomController) roomPair.getController();
+      System.out.println("setting context to guessing state");
+      roomController.getContext().setState(roomController.getContext().getGuessingState());
+      roomController.initializeGuessingState();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   /**
    * This method is invoked when the application starts. It loads and shows the "room" scene using
    * the caching system.
@@ -141,6 +187,14 @@ public class App extends Application {
   @Override
   public void start(final Stage stage) throws IOException {
     primaryStage = stage; // Store reference to primary stage
+
+    // Set up timer expired callback to force return to room
+    GameTimer.getInstance()
+        .setOnTimerExpired(
+            () -> {
+              forceReturnToRoom();
+            });
+
     SceneControllerPair pair = loadAndCacheScene("startMenu");
     scene = pair.getScene();
     stage.setScene(scene);

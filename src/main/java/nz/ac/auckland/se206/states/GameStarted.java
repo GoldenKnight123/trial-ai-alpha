@@ -2,8 +2,8 @@ package nz.ac.auckland.se206.states;
 
 import java.io.IOException;
 import javafx.scene.input.MouseEvent;
-import nz.ac.auckland.se206.App;
 import nz.ac.auckland.se206.GameStateContext;
+import nz.ac.auckland.se206.GameTimer;
 import nz.ac.auckland.se206.controllers.RoomController;
 import nz.ac.auckland.se206.speech.TextToSpeech;
 
@@ -34,26 +34,29 @@ public class GameStarted implements GameState {
    */
   @Override
   public void handleRectangleClick(MouseEvent event, String rectangleId) throws IOException {
-    // Transition to chat view or provide an introduction based on the clicked rectangle
+    if (GameTimer.getInstance().getTimeLeft() <= 2) {
+      return;
+    }
+
+    // Take the user to the chat scene with the clicked individual as the flashback focus
     RoomController roomController = context.getRoomController();
 
     switch (rectangleId) {
-      case "rectCashier":
-        String cashierMessage = "Welcome to my cafe!";
-        if (roomController != null) {
-          roomController.displayTextWithTypewriterEffect(cashierMessage);
-        }
-        TextToSpeech.speak(cashierMessage);
-        return;
-      case "rectWaitress":
-        String waitressMessage = "Hi, let me know when you are ready to order!";
-        if (roomController != null) {
-          roomController.displayTextWithTypewriterEffect(waitressMessage);
-        }
-        TextToSpeech.speak(waitressMessage);
-        return;
+      case "rectWitnessAI":
+        System.out.println("Clicked on AI witness rectangle");
+        roomController.fadeOut(event, "LOGOS-09");
+        break;
+
+      case "rectWitnessHuman":
+        System.out.println("Clicked on Human witness rectangle");
+        roomController.fadeOut(event, "Evan");
+        break;
+
+      case "rectDefendant":
+        System.out.println("Clicked on Defendant rectangle");
+        roomController.fadeOut(event, "INDUS-07");
+        break;
     }
-    App.openChat(event, context.getProfession(rectangleId));
   }
 
   /**
@@ -77,6 +80,6 @@ public class GameStarted implements GameState {
   @Override
   public void handleGeneralClick() throws IOException {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'handleGeneralClick'");
+    System.out.println("General click handled");
   }
 }

@@ -33,31 +33,7 @@ public class Guessing implements GameState {
    */
   @Override
   public void handleRectangleClick(MouseEvent event, String rectangleId) throws IOException {
-    RoomController roomController = context.getRoomController();
-
-    if (rectangleId.equals("rectCashier") || rectangleId.equals("rectWaitress")) {
-      String message = "You should click on the customers";
-      if (roomController != null) {
-        roomController.displayTextWithTypewriterEffect(message);
-      }
-      TextToSpeech.speak(message);
-      return;
-    }
-
-    String clickedProfession = context.getProfession(rectangleId);
-    String resultMessage;
-
-    if (rectangleId.equals(context.getRectIdToGuess())) {
-      resultMessage = "Correct! You won! This is the " + clickedProfession;
-    } else {
-      resultMessage = "You lost! This is the " + clickedProfession;
-    }
-
-    if (roomController != null) {
-      roomController.displayTextWithTypewriterEffect(resultMessage);
-    }
-    TextToSpeech.speak(resultMessage);
-    context.setState(context.getGameOverState());
+    System.out.println("Cannot click in this state.");
   }
 
   /**
@@ -79,7 +55,11 @@ public class Guessing implements GameState {
 
   @Override
   public void handleGeneralClick() throws IOException {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'handleGeneralClick'");
+    RoomController roomController = context.getRoomController();
+    if (roomController.isTyping()) {
+      roomController.finishTypingInstantly();
+    } else {
+      roomController.displayNextLine();
+    }
   }
 }
