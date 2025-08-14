@@ -60,6 +60,9 @@ public abstract class Controller {
                   textArea.setText(existingText + textToDisplay.substring(0, charIndex));
                 }
 
+                // Auto-scroll to bottom after each character is added
+                textArea.setScrollTop(Double.MAX_VALUE);
+
                 // Check if this is the last character being displayed
                 if (charIndex == textToDisplay.length()) {
                   isTyping = false;
@@ -134,6 +137,9 @@ public abstract class Controller {
 
       // Set the full text immediately
       currentTextArea.setText(currentFullText);
+
+      // Auto-scroll to bottom when finishing instantly
+      currentTextArea.setScrollTop(Double.MAX_VALUE);
 
       isTyping = false;
       onTypewriterEffectFinish();

@@ -1,9 +1,12 @@
 package nz.ac.auckland.se206.controllers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -15,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import nz.ac.auckland.apiproxy.chat.openai.ChatCompletionRequest;
 import nz.ac.auckland.apiproxy.chat.openai.ChatCompletionRequest.Model;
@@ -37,7 +41,11 @@ public class ChatController extends Controller {
   @FXML private TextField txtInput;
   @FXML private Button btnSend;
   @FXML private Label lblSceneName;
+  @FXML private Label lblWhoSpeaking;
   @FXML private AnchorPane chatRoom;
+  @FXML private Button btnHistory;
+  @FXML private TextArea txtaHistory;
+  @FXML private Rectangle rectHistory;
 
   private ChatCompletionRequest chatCompletionRequest;
   private String target;
@@ -46,6 +54,11 @@ public class ChatController extends Controller {
   private boolean waitingForGptResponse = false;
   private ChatMessage pendingGptResponse = null;
   private String currentSpeaker = ""; // Track who is currently displaying text ("user" or "gpt")
+  private HashMap<String, List<ChatMessage>> chatHistory = new HashMap<>();
+  private String chatHistoryText = ""; // Store chat history text
+  private String chatHistoryTextSnapShot = ""; // Store chat history text snapshot
+  private boolean historyView = false;
+  private boolean isAnimating = false; // Track if history animation is playing
 
   /**
    * Initializes the chat view.
@@ -56,10 +69,15 @@ public class ChatController extends Controller {
   public void initialize() throws ApiProxyException {
     txtInput.setVisible(false);
     btnSend.setVisible(false);
+    txtaHistory.setVisible(false);
+    rectHistory.setVisible(false);
+    rectHistory.setOpacity(0);
+    rectHistory.setDisable(true);
     fixedDialogue.put(
         "LOGOS-09",
         "It is currently 16-07-2027 22:17:32. I have detected a command from administrator to put"
             + " INDUS-07 to sleep.");
+    chatHistory.put("LOGOS-09", new ArrayList<>());
   }
 
   /**
@@ -122,6 +140,7 @@ public class ChatController extends Controller {
   public void setTarget(String target) {
     this.target = target;
     lblSceneName.setText("Flashback - " + target);
+    chatHistoryTextSnapShot = chatHistoryText; // Store a snapshot of the chat history
     try {
       ApiProxyConfig config = ApiProxyConfig.readConfig();
       chatCompletionRequest =
@@ -129,10 +148,18 @@ public class ChatController extends Controller {
               .setN(1)
               .setTemperature(0.2)
               .setTopP(0.5)
-              .setModel(Model.GPT_4_1_NANO)
+              .setModel(Model.GPT_4o_MINI)
               .setMaxTokens(200);
       currentSpeaker = "gpt";
-      displayTextWithTypewriterEffect(txtaChat, fixedDialogue.get(target));
+      lblWhoSpeaking.setText(target + ":");
+
+      // If the chatHistorySnapshot does not contain the targets fixed dialogue display it
+      if (!chatHistoryTextSnapShot.contains(fixedDialogue.get(target))) {
+        String message = fixedDialogue.get(target);
+        chatHistory.get(target).add(new ChatMessage("assistant", message));
+        chatHistoryText += target + ": " + message + "\n\n"; // Update chat history text
+        displayTextWithTypewriterEffect(txtaChat, message);
+      }
     } catch (ApiProxyException e) {
       e.printStackTrace();
     }
@@ -146,7 +173,15 @@ public class ChatController extends Controller {
    * @throws ApiProxyException if there is an error communicating with the API proxy
    */
   private ChatMessage runGpt(ChatMessage msg) throws ApiProxyException {
-    chatCompletionRequest.addMessage(msg);
+    // Add the system prompt
+    chatCompletionRequest.addMessage(
+        new ChatMessage("system", getSystemPrompt(target) + chatHistoryTextSnapShot));
+
+    // Add all messages from the chat history
+    for (ChatMessage message : chatHistory.get(target)) {
+      chatCompletionRequest.addMessage(message);
+    }
+
     try {
       ChatCompletionResult chatCompletionResult = chatCompletionRequest.execute();
       Choice result = chatCompletionResult.getChoices().iterator().next();
@@ -155,6 +190,13 @@ public class ChatController extends Controller {
       // Update UI on JavaFX Application Thread
       Platform.runLater(
           () -> {
+            // Add message to history
+            chatHistory.get(target).add(result.getChatMessage());
+            chatHistoryText +=
+                target
+                    + ": "
+                    + result.getChatMessage().getContent()
+                    + "\n\n"; // Update chat history text
             if (userMessageFinishTime > 0) {
               System.out.println("User message has finished, displaying with delay");
               // User message has finished, display with delay
@@ -193,6 +235,7 @@ public class ChatController extends Controller {
                   javafx.util.Duration.millis(additionalDelay),
                   e -> {
                     currentSpeaker = "gpt";
+                    lblWhoSpeaking.setText(target + ":");
                     displayTextWithTypewriterEffect(txtaChat, message.getContent());
                     // Start text-to-speech in background
                     new Thread(() -> TextToSpeech.speak(message.getContent())).start();
@@ -202,6 +245,7 @@ public class ChatController extends Controller {
     } else {
       // No additional delay needed
       currentSpeaker = "gpt";
+      lblWhoSpeaking.setText(target + ":");
       displayTextWithTypewriterEffect(txtaChat, message.getContent());
       // Start text-to-speech in background
       new Thread(() -> TextToSpeech.speak(message.getContent())).start();
@@ -252,8 +296,14 @@ public class ChatController extends Controller {
     pendingGptResponse = null;
     waitingForGptResponse = true;
     currentSpeaker = "user";
+    lblWhoSpeaking.setText("You:");
 
     ChatMessage msg = new ChatMessage("user", message);
+
+    // Add message to history
+    chatHistory.get(target).add(msg);
+    chatHistoryText += "You: " + msg.getContent() + "\n"; // Update chat history text
+
     displayTextWithTypewriterEffect(txtaChat, message);
 
     // Create a background task to run GPT
@@ -305,5 +355,77 @@ public class ChatController extends Controller {
   @FXML
   private void onGoBack(ActionEvent event) throws ApiProxyException, IOException {
     fadeOut(event);
+  }
+
+  /**
+   * Toggles chat history view.
+   *
+   * @param event the action event triggered by the go back button
+   * @throws ApiProxyException if there is an error communicating with the API proxy
+   * @throws IOException if there is an I/O error
+   */
+  @FXML
+  private void toggleHistory(ActionEvent event) throws ApiProxyException, IOException {
+    // Prevent clicks during animation
+    if (isAnimating) {
+      return;
+    }
+
+    if (!historyView) {
+      isAnimating = true; // Set flag to prevent further clicks
+
+      txtaHistory.setText(chatHistoryText); // Set chat history text
+
+      rectHistory.setVisible(true);
+      // Fade rectHistory to 0.5 opacity
+      FadeTransition fade = new FadeTransition(Duration.millis(300), rectHistory);
+      fade.setFromValue(0);
+      fade.setToValue(0.5);
+
+      // Set initial position off-screen to the right
+      txtaHistory.setTranslateX(txtaHistory.getWidth());
+
+      // Create slide-in animation from the right
+      TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), txtaHistory);
+      slideIn.setFromX(txtaHistory.getWidth());
+      slideIn.setToX(0);
+
+      // Reset animation flag when complete
+      slideIn.setOnFinished(e -> isAnimating = false);
+
+      // Play animations
+      fade.play();
+      slideIn.play();
+
+      txtaHistory.setVisible(true);
+      historyView = true;
+      btnHistory.setText("Hide History");
+    } else {
+      isAnimating = true; // Set flag to prevent further clicks
+
+      // Fade rectHistory to 0 opacity
+      FadeTransition fade = new FadeTransition(Duration.millis(300), rectHistory);
+      fade.setFromValue(0.5);
+      fade.setToValue(0);
+      fade.play();
+
+      // Create slide-out animation to the right
+      TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), txtaHistory);
+      slideOut.setFromX(0);
+      slideOut.setToX(txtaHistory.getWidth());
+      slideOut.play();
+
+      // Hide elements after animation completes and reset state
+      slideOut.setOnFinished(
+          e -> {
+            txtaHistory.setVisible(false);
+            isAnimating = false; // Reset animation flag
+          });
+      fade.setOnFinished(e -> rectHistory.setVisible(false));
+
+      historyView = false; // Reset the flag when closing is complete
+
+      btnHistory.setText("Show History");
+    }
   }
 }
