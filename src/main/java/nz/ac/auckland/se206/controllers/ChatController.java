@@ -77,7 +77,17 @@ public class ChatController extends Controller {
         "LOGOS-09",
         "It is currently 16-07-2027 22:17:32. I have detected a command from administrator to put"
             + " INDUS-07 to sleep.");
+    fixedDialogue.put(
+        "INDUS-07",
+        "It is currently 17-07-2027 9:27:34. I have just awoken from sleep mode. Memories from the"
+            + " past 12 hours are missing.");
+    fixedDialogue.put(
+        "Evan",
+        "It's early in the morning. I just arrived at the Manukau Power Plant site and heard a huge"
+            + " explosion.");
     chatHistory.put("LOGOS-09", new ArrayList<>());
+    chatHistory.put("INDUS-07", new ArrayList<>());
+    chatHistory.put("Evan", new ArrayList<>());
   }
 
   /**
@@ -155,10 +165,19 @@ public class ChatController extends Controller {
 
       // If the chatHistorySnapshot does not contain the targets fixed dialogue display it
       if (!chatHistoryTextSnapShot.contains(fixedDialogue.get(target))) {
+        txtInput.setVisible(false);
+        btnSend.setVisible(false);
         String message = fixedDialogue.get(target);
         chatHistory.get(target).add(new ChatMessage("assistant", message));
         chatHistoryText += target + ": " + message + "\n\n"; // Update chat history text
         displayTextWithTypewriterEffect(txtaChat, message);
+      } else {
+        // Find the last message sent by target in chatHistoryTextSnapShot
+        String lastMessage =
+            chatHistoryTextSnapShot.substring(
+                chatHistoryTextSnapShot.lastIndexOf(target + ": ") + (target + ": ").length());
+        lastMessage = lastMessage.substring(0, lastMessage.indexOf("\n\n"));
+        txtaChat.setText(lastMessage);
       }
     } catch (ApiProxyException e) {
       e.printStackTrace();
@@ -173,9 +192,10 @@ public class ChatController extends Controller {
    * @throws ApiProxyException if there is an error communicating with the API proxy
    */
   private ChatMessage runGpt(ChatMessage msg) throws ApiProxyException {
-    // Add the system prompt
+    // Add the system prompt and chat history snapshot with all "You" replaced with "Judge"
     chatCompletionRequest.addMessage(
-        new ChatMessage("system", getSystemPrompt(target) + chatHistoryTextSnapShot));
+        new ChatMessage(
+            "system", getSystemPrompt(target) + chatHistoryTextSnapShot.replace("You", "Judge")));
 
     // Add all messages from the chat history
     for (ChatMessage message : chatHistory.get(target)) {

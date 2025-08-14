@@ -14,7 +14,7 @@
          <font>
             <Font size="24.0" />
          </font></TextArea>
-    <TextField fx:id="txtInput" layoutX="35.0" layoutY="287.0" onKeyPressed="#onKeyPressed" prefHeight="26.0" prefWidth="1087.0" />
+    <TextField fx:id="txtInput" layoutX="35.0" layoutY="287.0" onKeyPressed="#onKeyPressed" prefHeight="26.0" prefWidth="1087.0" promptText="Enter your message here..." />
     <Button fx:id="btnSend" layoutX="1148.0" layoutY="287.0" mnemonicParsing="false" onAction="#onSendMessage" prefHeight="26.0" prefWidth="97.0" text="Send" />
     <Button layoutX="961.0" layoutY="17.0" mnemonicParsing="false" onAction="#onGoBack" prefHeight="44.0" prefWidth="143.0" text="Go Back to Courtroom" />
       <Label fx:id="lblSceneName" layoutX="9.0" layoutY="3.0" text="Flashback">
