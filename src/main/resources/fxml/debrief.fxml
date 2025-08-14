@@ -12,6 +12,11 @@
             <Font size="48.0" />
          </font>
       </Label>
+      <Label fx:id="lblThinking" alignment="CENTER" layoutX="590.0" layoutY="400.0" text="Thinking..." textAlignment="CENTER" visible="false">
+         <font>
+            <Font size="36.0" />
+         </font>
+      </Label>
       <TextArea fx:id="txtaDebrief" editable="false" layoutX="46.0" layoutY="95.0" prefHeight="587.0" prefWidth="1190.0" text="Loading AI Generated Debrief..." wrapText="true">
          <font>
             <Font size="24.0" />

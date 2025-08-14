@@ -276,6 +276,12 @@ public class RoomController extends Controller {
       txtaDialogue.setVisible(false);
       btnGuilty.setVisible(true);
       btnNotGuilty.setVisible(true);
+      lblTimer.setVisible(true);
+      arcTimer.setVisible(true);
+      GameTimer.getInstance().setMaxTime(10);
+      GameTimer.getInstance().updateTimerDisplay();
+      GameTimer.getInstance().start();
+      GameTimer.getInstance().setOnTimerExpired(null);
     }
   }
 

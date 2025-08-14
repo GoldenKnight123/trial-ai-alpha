@@ -20,6 +20,7 @@ public class GameTimer {
   private static GameTimer instance;
   private Timeline timeline;
   private int secondsLeft = 120;
+  private int maxTime = 120;
   private boolean isRunning = false;
   private List<Label> timerLabels = new ArrayList<>();
   private List<Arc> timerArcs = new ArrayList<>();
@@ -82,6 +83,13 @@ public class GameTimer {
     return secondsLeft;
   }
 
+  /** Get the maximum time */
+  public int setMaxTime(int maxTime) {
+    this.maxTime = maxTime;
+    secondsLeft = maxTime;
+    return maxTime;
+  }
+
   /**
    * Sets the callback to be called when the timer expires.
    *
@@ -115,12 +123,12 @@ public class GameTimer {
     if (!timerArcs.contains(arc)) {
       timerArcs.add(arc);
       // Update the arc immediately with current time
-      Platform.runLater(() -> arc.setLength(360.0 * secondsLeft / 120));
+      Platform.runLater(() -> arc.setLength(360.0 * secondsLeft / maxTime));
     }
   }
 
   /** Updates all registered timer labels with the current time. */
-  private void updateTimerDisplay() {
+  public void updateTimerDisplay() {
     String timeString = String.format("%3d", secondsLeft);
     Platform.runLater(
         () -> {
@@ -128,7 +136,7 @@ public class GameTimer {
             label.setText(timeString);
           }
           for (Arc arc : timerArcs) {
-            arc.setLength(360.0 * secondsLeft / 120);
+            arc.setLength(360.0 * secondsLeft / maxTime);
           }
         });
   }

@@ -123,7 +123,7 @@ public class DebriefController extends Controller {
               .setTemperature(0.2)
               .setTopP(0.5)
               .setModel(Model.GPT_4o_MINI)
-              .setMaxTokens(500);
+              .setMaxTokens(2000);
     } catch (ApiProxyException e) {
       e.printStackTrace();
     }

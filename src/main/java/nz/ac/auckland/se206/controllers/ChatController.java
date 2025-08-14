@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -45,6 +47,7 @@ public class ChatController extends Controller {
   @FXML private Button btnReturn;
   @FXML private Label lblSceneName;
   @FXML private Label lblWhoSpeaking;
+  @FXML private Label lblThinking;
   @FXML private AnchorPane chatRoom;
   @FXML private Button btnHistory;
   @FXML private TextArea txtaHistory;
@@ -65,6 +68,7 @@ public class ChatController extends Controller {
   private boolean historyView = false;
   private boolean isAnimating = false; // Track if history animation is playing
   private boolean isFading = false; // Track if fade animation is playing
+  private Timeline thinkingAnimation; // Track thinking animation
 
   /**
    * Initializes the chat view.
@@ -275,6 +279,7 @@ public class ChatController extends Controller {
                   e -> {
                     currentSpeaker = "gpt";
                     lblWhoSpeaking.setText(target + ":");
+                    stopThinkingAnimation();
                     displayTextWithTypewriterEffect(txtaChat, message.getContent());
                     // Start text-to-speech in background
                     new Thread(() -> TextToSpeech.speak(message.getContent())).start();
@@ -285,6 +290,7 @@ public class ChatController extends Controller {
       // No additional delay needed
       currentSpeaker = "gpt";
       lblWhoSpeaking.setText(target + ":");
+      stopThinkingAnimation();
       displayTextWithTypewriterEffect(txtaChat, message.getContent());
       // Start text-to-speech in background
       new Thread(() -> TextToSpeech.speak(message.getContent())).start();
@@ -297,6 +303,7 @@ public class ChatController extends Controller {
     if (waitingForGptResponse && currentSpeaker.equals("user")) {
       // User message typewriter finished, record the time
       userMessageFinishTime = System.currentTimeMillis();
+      startThinkingAnimation();
 
       // If GPT response is ready, display it after minimum delay
       if (pendingGptResponse != null) {
@@ -365,6 +372,8 @@ public class ChatController extends Controller {
     // Handle task failure
     gptTask.setOnFailed(
         e -> {
+          // Stop thinking animation
+          stopThinkingAnimation();
           Platform.runLater(
               () -> {
                 // Re-enable controls even if the task failed
@@ -476,6 +485,34 @@ public class ChatController extends Controller {
 
       btnHistory.setText("Show History");
     }
+  }
+
+  /** Starts the thinking animation by cycling through dots appearing and disappearing. */
+  private void startThinkingAnimation() {
+    if (thinkingAnimation != null) {
+      thinkingAnimation.stop();
+    }
+
+    lblThinking.setVisible(true);
+
+    // Create timeline that cycles through different thinking states
+    thinkingAnimation =
+        new Timeline(
+            new KeyFrame(Duration.millis(0), e -> lblThinking.setText("Thinking")),
+            new KeyFrame(Duration.millis(250), e -> lblThinking.setText("Thinking.")),
+            new KeyFrame(Duration.millis(500), e -> lblThinking.setText("Thinking..")),
+            new KeyFrame(Duration.millis(750), e -> lblThinking.setText("Thinking...")));
+
+    thinkingAnimation.setCycleCount(Timeline.INDEFINITE);
+    thinkingAnimation.play();
+  }
+
+  /** Stops the thinking animation and hides the thinking label. */
+  private void stopThinkingAnimation() {
+    if (thinkingAnimation != null) {
+      thinkingAnimation.stop();
+    }
+    lblThinking.setVisible(false);
   }
 
   /**

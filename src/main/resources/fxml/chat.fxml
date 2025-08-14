@@ -37,5 +37,10 @@
          </font>
       </Label>
       <Arc fx:id="arcTimer" layoutX="35.0" layoutY="35.0" length="360.0" opacity="0.25" radiusX="30.0" radiusY="30.0" startAngle="90.0" stroke="BLACK" strokeType="INSIDE" type="ROUND" />
+      <Label fx:id="lblThinking" layoutX="1134.0" layoutY="309.0" text="Thinking..." visible="false">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
   </children>
 </AnchorPane>
