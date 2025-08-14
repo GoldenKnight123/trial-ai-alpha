@@ -12,7 +12,7 @@ import javafx.util.Duration;
 public abstract class Controller {
 
   private Timeline typewriterTimeline; // Timeline for typewriter effect
-  public boolean isTyping = false;
+  private boolean isTyping = false;
   private String currentFullText = ""; // Store the full text being displayed
   private TextArea currentTextArea = null; // Store the current TextArea being used
 
@@ -151,7 +151,7 @@ public abstract class Controller {
     // Override this method in subclasses to handle the end of the typewriter effect
   }
 
-  protected boolean isTyping() {
+  public boolean isTyping() {
     return isTyping;
   }
 }

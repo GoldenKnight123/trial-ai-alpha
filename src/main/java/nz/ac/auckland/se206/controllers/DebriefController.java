@@ -83,7 +83,11 @@ public class DebriefController extends Controller {
     gptThread.start();
   }
 
-  /** Builds the analysis prompt for GPT based on chat history and decision correctness */
+  /**
+   * Creates a prompt to feed into GPT using the chat history and whether or not the user chose the
+   * correct verdict between guilty and not guilty. It's designed to use specific quotes and
+   * evidence to give detailed feedback
+   */
   private String buildAnalysisPrompt(String chatHistory, boolean wasCorrect) {
     StringBuilder prompt = new StringBuilder();
     prompt.append(

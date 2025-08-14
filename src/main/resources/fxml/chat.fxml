@@ -30,7 +30,7 @@
       </Label>
       <Rectangle fx:id="rectHistory" arcHeight="5.0" arcWidth="5.0" height="720.0" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="1280.0" />
       <TextArea fx:id="txtaHistory" editable="false" layoutX="808.0" layoutY="72.0" prefHeight="620.0" prefWidth="444.0" visible="false" wrapText="true" />
-      <Button fx:id="btnHistory" layoutX="1116.0" layoutY="17.0" mnemonicParsing="false" onAction="#toggleHistory" prefHeight="44.0" prefWidth="143.0" text="Show History" />
+      <Button fx:id="btnHistory" layoutX="1116.0" layoutY="17.0" mnemonicParsing="false" onAction="#onToggleHistory" prefHeight="44.0" prefWidth="143.0" text="Show History" />
       <Label fx:id="lblTimer" alignment="CENTER" layoutX="14.0" layoutY="14.0" text="120" textFill="#000000">
          <font>
             <Font name="System Bold" size="24.0" />

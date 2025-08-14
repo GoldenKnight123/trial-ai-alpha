@@ -17,19 +17,6 @@ public class GameTimer {
     void onTimerExpired();
   }
 
-  private static GameTimer instance;
-  private Timeline timeline;
-  private int secondsLeft = 120;
-  private int maxTime = 120;
-  private boolean isRunning = false;
-  private List<Label> timerLabels = new ArrayList<>();
-  private List<Arc> timerArcs = new ArrayList<>();
-  private TimerExpiredCallback expiredCallback;
-
-  private GameTimer() {
-    initializeTimer();
-  }
-
   /**
    * Gets the singleton instance of the GameTimer.
    *
@@ -40,6 +27,20 @@ public class GameTimer {
       instance = new GameTimer();
     }
     return instance;
+  }
+
+  private static GameTimer instance;
+  private Timeline timeline;
+  private int secondsLeft = 120;
+  private int maxTime = 120;
+  private boolean isRunning = false;
+  private List<Label> timerLabels = new ArrayList<>();
+  private List<Arc> timerArcs = new ArrayList<>();
+  private TimerExpiredCallback expiredCallback;
+
+  /** Private constructor for singleton pattern */
+  private GameTimer() {
+    initializeTimer();
   }
 
   /** Initializes the JavaFX Timeline for the timer. */

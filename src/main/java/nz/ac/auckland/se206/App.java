@@ -20,13 +20,6 @@ import nz.ac.auckland.se206.controllers.RoomController;
  */
 public class App extends Application {
 
-  private static Scene scene;
-  private static Stage primaryStage;
-
-  // Cache for storing loaded scenes and their controllers
-  private static Map<String, Scene> sceneCache = new HashMap<>();
-  private static Map<String, Object> controllerCache = new HashMap<>();
-
   /** Inner class to hold both scene and controller together */
   private static class SceneControllerPair {
     private final Scene scene;
@@ -45,6 +38,14 @@ public class App extends Application {
       return controller;
     }
   }
+
+  // Cached scene and primary stage
+  private static Scene scene;
+  private static Stage primaryStage;
+
+  // Cache for storing loaded scenes and controllers
+  private static Map<String, Scene> sceneCache = new HashMap<>();
+  private static Map<String, Object> controllerCache = new HashMap<>();
 
   /**
    * The main method that launches the JavaFX application.

@@ -270,12 +270,12 @@ public class ChatController extends Controller {
 
     if (additionalDelay > 0) {
       // Use Timeline to create a delay before showing GPT response
-      javafx.animation.Timeline timeline = new javafx.animation.Timeline();
+      Timeline timeline = new Timeline();
       timeline
           .getKeyFrames()
           .add(
-              new javafx.animation.KeyFrame(
-                  javafx.util.Duration.millis(additionalDelay),
+              new KeyFrame(
+                  Duration.millis(additionalDelay),
                   e -> {
                     currentSpeaker = "gpt";
                     lblWhoSpeaking.setText(target + ":");
@@ -372,7 +372,6 @@ public class ChatController extends Controller {
     // Handle task failure
     gptTask.setOnFailed(
         e -> {
-          // Stop thinking animation
           stopThinkingAnimation();
           Platform.runLater(
               () -> {
@@ -423,7 +422,7 @@ public class ChatController extends Controller {
    * @throws IOException if there is an I/O error
    */
   @FXML
-  private void toggleHistory(ActionEvent event) throws ApiProxyException, IOException {
+  private void onToggleHistory(ActionEvent event) throws ApiProxyException, IOException {
     // Prevent clicks during animation
     if (isAnimating) {
       return;

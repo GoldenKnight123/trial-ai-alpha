@@ -25,18 +25,6 @@ import nz.ac.auckland.se206.GameTimer;
  */
 public class RoomController extends Controller {
 
-  @FXML private Rectangle rectWitnessAI;
-  @FXML private Rectangle rectDefendant;
-  @FXML private Rectangle rectWitnessHuman;
-  @FXML private TextArea txtaDialogue;
-  @FXML private Label lblContinue;
-  @FXML private Label lblInstructions;
-  @FXML private Label lblTimer;
-  @FXML private Button btnGuilty;
-  @FXML private Button btnNotGuilty;
-  @FXML private Arc arcTimer;
-  @FXML private Pane room;
-
   private static boolean isFirstTimeInit = true;
   private static List<String> fixedDialogue = new ArrayList<>();
   private static int currentDialogueIndex = 0;
@@ -44,7 +32,7 @@ public class RoomController extends Controller {
   private boolean isFading = false;
   private boolean isGuessing = false;
 
-  /** Initialises the fixed dialogue options. */
+  /** Initializes introductory dialogue for the trial. Each line is a separate item in the list. */
   private static void initializeFixedDialogue() {
     fixedDialogue.add(
         "Members of the jury - human and artificial. We shall now commence the trial of INDUS-07.");
@@ -71,6 +59,18 @@ public class RoomController extends Controller {
         "Using the Omni-View-02, I shall analyse the memories of the witnesses and defendant to"
             + " come to a conclusion of whether or not the defendant is guilty or innocent.");
   }
+
+  @FXML private Rectangle rectWitnessAI;
+  @FXML private Rectangle rectDefendant;
+  @FXML private Rectangle rectWitnessHuman;
+  @FXML private TextArea txtaDialogue;
+  @FXML private Label lblContinue;
+  @FXML private Label lblInstructions;
+  @FXML private Label lblTimer;
+  @FXML private Button btnGuilty;
+  @FXML private Button btnNotGuilty;
+  @FXML private Arc arcTimer;
+  @FXML private Pane room;
 
   /** Initialisation of guessing state */
   public void initializeGuessingState() {
@@ -258,6 +258,10 @@ public class RoomController extends Controller {
     lblContinue.setVisible(true);
   }
 
+  /**
+   * Display the next line of fixed dialogue, if all fixed dialogue has been consumed then it will
+   * trigger the different changes to the scene based on which state the user is currently in.
+   */
   public void displayNextLine() {
     if (currentDialogueIndex < fixedDialogue.size()) {
       lblContinue.setVisible(false);
@@ -288,10 +292,6 @@ public class RoomController extends Controller {
   /** Finishes the current typewriter effect instantly. */
   public void finishTypingInstantly() {
     finishTypewriterEffectInstantly();
-  }
-
-  public boolean isTyping() {
-    return isTyping;
   }
 
   public Pane getRoom() {
