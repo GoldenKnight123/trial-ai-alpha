@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.Set;
 import javafx.scene.input.MouseEvent;
 import nz.ac.auckland.se206.controllers.RoomController;
-import nz.ac.auckland.se206.states.GameOver;
 import nz.ac.auckland.se206.states.GameStarted;
 import nz.ac.auckland.se206.states.GameState;
 import nz.ac.auckland.se206.states.Guessing;
@@ -29,7 +28,6 @@ public class GameStateContext {
   private final OpeningStatement openingStatementState;
   private final GameStarted gameStartedState;
   private final Guessing guessingState;
-  private final GameOver gameOverState;
   private GameState gameState;
   private RoomController roomController; // Reference to room controller for dialogue
 
@@ -38,7 +36,6 @@ public class GameStateContext {
     openingStatementState = new OpeningStatement(this);
     gameStartedState = new GameStarted(this);
     guessingState = new Guessing(this);
-    gameOverState = new GameOver(this);
 
     gameState = openingStatementState; // Initial state
     Map<String, Object> obj = null;
@@ -127,15 +124,6 @@ public class GameStateContext {
    */
   public GameState getGuessingState() {
     return guessingState;
-  }
-
-  /**
-   * Gets the game over state.
-   *
-   * @return the game over state
-   */
-  public GameState getGameOverState() {
-    return gameOverState;
   }
 
   /**

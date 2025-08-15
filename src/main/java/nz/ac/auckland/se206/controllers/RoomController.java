@@ -85,6 +85,7 @@ public class RoomController extends Controller {
   @FXML private Rectangle rectWitnessHuman;
   @FXML private TextArea txtaDialogue;
   @FXML private Label lblContinue;
+  @FXML private Label lblWhoSpeaking;
   @FXML private Label lblInstructions;
   @FXML private Label lblTimer;
   @FXML private Button btnGuilty;
@@ -97,6 +98,7 @@ public class RoomController extends Controller {
 
   public void initializeGuessingState() {
     txtaDialogue.setVisible(true);
+    lblWhoSpeaking.setVisible(true);
     lblContinue.setVisible(false);
     lblInstructions.setVisible(false);
     lblTimer.setVisible(true);
@@ -290,11 +292,13 @@ public class RoomController extends Controller {
     } else if (!isGuessing) {
       lblContinue.setVisible(false);
       txtaDialogue.setVisible(false);
+      lblWhoSpeaking.setVisible(false);
       lblInstructions.setVisible(true);
       context.setState(context.getGameStartedState());
     } else {
       lblContinue.setVisible(false);
       txtaDialogue.setVisible(false);
+      lblWhoSpeaking.setVisible(false);
       btnGuilty.setVisible(true);
       btnNotGuilty.setVisible(true);
     }

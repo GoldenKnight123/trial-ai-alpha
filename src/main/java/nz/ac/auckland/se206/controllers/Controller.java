@@ -55,7 +55,6 @@ public abstract class Controller {
     // Create the typewriter animation
     typewriterTimeline = new Timeline();
 
-    // Will add threading in the future
     for (int i = 0; i <= textToDisplay.length(); i++) {
       final int charIndex = i;
       KeyFrame keyFrame =

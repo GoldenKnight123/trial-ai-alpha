@@ -41,18 +41,15 @@ public class GameStarted implements GameState {
     RoomController roomController = context.getRoomController();
 
     switch (rectangleId) {
-      case "rectWitnessAI":
-        System.out.println("Clicked on AI witness rectangle");
+      case "rectWitnessAi":
         roomController.fadeOut(event, "LOGOS-09");
         break;
 
       case "rectWitnessHuman":
-        System.out.println("Clicked on Human witness rectangle");
         roomController.fadeOut(event, "Evan");
         break;
 
       case "rectDefendant":
-        System.out.println("Clicked on Defendant rectangle");
         roomController.fadeOut(event, "INDUS-07");
         break;
     }

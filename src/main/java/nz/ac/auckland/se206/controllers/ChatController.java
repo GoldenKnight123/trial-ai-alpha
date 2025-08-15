@@ -534,7 +534,8 @@ public class ChatController extends Controller {
             new KeyFrame(Duration.millis(0), e -> lblThinking.setText("Thinking")),
             new KeyFrame(Duration.millis(250), e -> lblThinking.setText("Thinking.")),
             new KeyFrame(Duration.millis(500), e -> lblThinking.setText("Thinking..")),
-            new KeyFrame(Duration.millis(750), e -> lblThinking.setText("Thinking...")));
+            new KeyFrame(Duration.millis(750), e -> lblThinking.setText("Thinking...")),
+            new KeyFrame(Duration.millis(1000), e -> lblThinking.setText("Thinking")));
 
     thinkingAnimation.setCycleCount(Timeline.INDEFINITE);
     thinkingAnimation.play();
