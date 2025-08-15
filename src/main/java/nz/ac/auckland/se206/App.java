@@ -67,7 +67,6 @@ public class App extends Application {
     String cacheKey = fxml;
 
     if (!sceneCache.containsKey(cacheKey)) {
-      System.out.println("loading");
       FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/" + fxml + ".fxml"));
       Parent root = loader.load();
       Object controller = loader.getController();
@@ -122,7 +121,6 @@ public class App extends Application {
 
   public static void openRoom(ActionEvent event) throws IOException {
     SceneControllerPair pair = loadAndCacheScene("room");
-    System.out.println("Opening room scene...");
 
     // Ensure the room is visible when returning to it
     RoomController roomController = (RoomController) pair.getController();
@@ -135,7 +133,6 @@ public class App extends Application {
 
   public static void openDebrief(ActionEvent event, boolean correct) throws IOException {
     SceneControllerPair pair = loadAndCacheScene("debrief");
-    System.out.println("Opening debrief scene...");
 
     // Ensure the debrief is visible when returning to it
     DebriefController debriefController = (DebriefController) pair.getController();
@@ -167,7 +164,6 @@ public class App extends Application {
       if (primaryStage.getScene().getRoot().getId().equals("room")) {
         SceneControllerPair roomPair = loadAndCacheScene("room");
         RoomController roomController = (RoomController) roomPair.getController();
-        System.out.println("setting context to guessing state");
         roomController.getContext().setState(roomController.getContext().getGuessingState());
         roomController.initializeGuessingState();
         return;
@@ -178,9 +174,10 @@ public class App extends Application {
       ChatController chatController = (ChatController) pair.getController();
       chatController.fadeOut(null);
 
+      chatController.forceStopAudio();
+
       SceneControllerPair roomPair = loadAndCacheScene("room");
       RoomController roomController = (RoomController) roomPair.getController();
-      System.out.println("setting context to guessing state");
       roomController.getContext().setState(roomController.getContext().getGuessingState());
       roomController.initializeGuessingState();
     } catch (IOException e) {

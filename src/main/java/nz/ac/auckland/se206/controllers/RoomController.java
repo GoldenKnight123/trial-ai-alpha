@@ -258,6 +258,7 @@ public class RoomController extends Controller {
    */
   @FXML
   private void onChooseGuilty(ActionEvent event) throws IOException {
+    GameTimer.getInstance().stop();
     App.openDebrief(null, false);
   }
 
@@ -269,13 +270,13 @@ public class RoomController extends Controller {
    */
   @FXML
   private void onChooseNotGuilty(ActionEvent event) throws IOException {
+    GameTimer.getInstance().stop();
     App.openDebrief(null, true);
   }
 
   @Override
   protected void onTypewriterEffectFinish() {
     // Show the continue label when the typewriter effect finishes
-    System.out.println("finished line");
     lblContinue.setVisible(true);
   }
 

@@ -34,8 +34,6 @@ public class TextToSpeech {
       TextToSpeechRequest ttsRequest = new TextToSpeechRequest(config);
       ttsRequest.setText(text).setProvider(provider).setVoice(voice);
 
-      System.out.println("Sending TTS request: " + ttsRequest);
-
       TextToSpeechResult ttsResult = ttsRequest.execute();
       String audioUrl = ttsResult.getAudioUrl();
 

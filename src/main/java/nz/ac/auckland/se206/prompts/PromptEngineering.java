@@ -25,12 +25,10 @@ public class PromptEngineering {
   public static String getPrompt(String promptId, Map<String, String> data) {
     try {
       // Load the prompt template file from resources
-      System.out.println("Loading prompt template: " + promptId);
       URL resourceUrl =
           PromptEngineering.class.getClassLoader().getResource("prompts/" + promptId + ".txt");
       String template = loadTemplate(resourceUrl.toURI());
       // Fill the template with the provided data
-      System.out.println(fillTemplate(template, data));
       return fillTemplate(template, data);
     } catch (IOException | URISyntaxException e) {
       e.printStackTrace();

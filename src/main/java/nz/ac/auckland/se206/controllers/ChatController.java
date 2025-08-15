@@ -18,8 +18,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.AudioClip;
 import javafx.scene.shape.Arc;
@@ -54,6 +56,8 @@ public class ChatController extends Controller {
   @FXML private Label lblSceneName;
   @FXML private Label lblWhoSpeaking;
   @FXML private Label lblThinking;
+  @FXML private Label lblComputer;
+  @FXML private ImageView imgComputer;
   @FXML private AnchorPane chatRoom;
   @FXML private Button btnHistory;
   @FXML private TextArea txtaHistory;
@@ -95,6 +99,10 @@ public class ChatController extends Controller {
     rectHistory.setVisible(false);
     rectHistory.setOpacity(0);
     rectHistory.setDisable(true);
+
+    imgComputer.setVisible(false);
+    lblComputer.setVisible(false);
+
     fixedDialogue.put(
         "LOGOS-09",
         "It is currently 16th July 22:17AM. I have detected a message from INDUS-07 sent to site"
@@ -180,13 +188,21 @@ public class ChatController extends Controller {
   public void setTarget(String target) {
     this.target = target;
     lblSceneName.setText("Flashback - " + target);
+
+    if (target.equals("LOGOS-09")) {
+      imgComputer.setVisible(true);
+      lblComputer.setVisible(true);
+    } else {
+      imgComputer.setVisible(false);
+      lblComputer.setVisible(false);
+    }
     chatHistoryTextSnapShot = chatHistoryText; // Store a snapshot of the chat history
     try {
       ApiProxyConfig config = ApiProxyConfig.readConfig();
       chatCompletionRequest =
           new ChatCompletionRequest(config)
               .setN(1)
-              .setTemperature(0.2)
+              .setTemperature(0.8)
               .setTopP(0.5)
               .setModel(Model.GPT_4o_MINI)
               .setMaxTokens(200);
@@ -371,6 +387,8 @@ public class ChatController extends Controller {
       return;
     }
 
+    forceStopAudio();
+
     // Clear input and disable controls to prevent multiple requests
     txtInput.clear();
     btnSend.setVisible(false);
@@ -445,7 +463,22 @@ public class ChatController extends Controller {
       return;
     }
 
+    forceStopAudio();
     fadeOut(event);
+  }
+
+  public void forceStopAudio() {
+    // Stop any ongoing TTS audio before leaving
+    if (storedTts != null) {
+      storedTts.close();
+      storedTts = null;
+    }
+
+    // Stop the TTS thread if it's still running
+    if (ttsThread != null && ttsThread.isAlive()) {
+      ttsThread.interrupt();
+      ttsThread = null;
+    }
   }
 
   /**
@@ -517,6 +550,27 @@ public class ChatController extends Controller {
       historyView = false; // Reset the flag when closing is complete
 
       btnHistory.setText("Show History");
+    }
+  }
+
+  /**
+   * Handles click on computer interactable
+   *
+   * @param event the action event triggered by the go back button
+   * @throws ApiProxyException if there is an error communicating with the API proxy
+   * @throws IOException if there is an I/O error
+   */
+  @FXML
+  private void onComputerClick(MouseEvent event) throws ApiProxyException, IOException {
+    // Handle computer click event
+    if (currentSpeaker.equals("") && !isTyping()) {
+      txtInput.setText(
+          "Did INDUS-07 receive any messages before sending the command to the workers?");
+      onSendMessage(null);
+      imgComputer.setDisable(true);
+      imgComputer.setOpacity(0.3);
+      lblComputer.setVisible(false);
+      return;
     }
   }
 

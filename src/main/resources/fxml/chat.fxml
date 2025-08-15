@@ -4,6 +4,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Arc?>
 <?import javafx.scene.shape.Rectangle?>
@@ -42,5 +44,11 @@
             <Font size="24.0" />
          </font>
       </Label>
+      <ImageView fx:id="imgComputer" fitHeight="150.0" fitWidth="200.0" layoutX="574.0" layoutY="72.0" onMouseClicked="#onComputerClick" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/computer.png" />
+         </image>
+      </ImageView>
+      <Label fx:id="lblComputer" layoutX="584.0" layoutY="214.0" text="Ask about log history" />
   </children>
 </AnchorPane>
